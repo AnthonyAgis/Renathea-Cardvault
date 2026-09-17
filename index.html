@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Renathea Cardvault - Card Search, Deckbuilder, Camp & Leaderboard</title>
+  
+  <!-- Firebase SDK (Compat Version untuk kemudahan integrasi tunggal) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --primary: #e60012;
@@ -43,7 +48,6 @@
       letter-spacing: 1px;
     }
 
-    /* Tab Navigasi Utama */
     .nav-tabs {
       display: flex;
       justify-content: center;
@@ -89,7 +93,6 @@
       display: block;
     }
 
-    /* Search & Filter Panel */
     .search-panel {
       background-color: var(--card-bg);
       border-radius: var(--radius);
@@ -247,7 +250,6 @@
       background: var(--primary);
     }
 
-    /* Results Stats */
     .results-info {
       font-size: 0.95rem;
       margin-bottom: 20px;
@@ -255,7 +257,6 @@
       color: var(--text-muted);
     }
 
-    /* Card Grid */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -377,7 +378,6 @@
       margin-bottom: 0;
     }
 
-    /* DECK BUILDER STYLING */
     .deck-builder-layout {
       display: grid;
       grid-template-columns: 340px 1fr;
@@ -487,7 +487,6 @@
       gap: 10px;
     }
 
-    /* COMMUNITY DECKS TAB STYLING */
     .community-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -547,7 +546,6 @@
       border-radius: 4px;
     }
 
-    /* CAMP TAB & DIRECTORY STYLING */
     .camp-info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -648,7 +646,6 @@
       border-bottom: none;
     }
 
-    /* CONTACT BANNER */
     .contact-banner {
       background: #1a1a1a;
       color: #fff;
@@ -669,7 +666,6 @@
       text-decoration: underline;
     }
 
-    /* ADMIN LOGIN & DASHBOARD STYLING */
     .admin-auth-box {
       max-width: 400px;
       margin: 60px auto;
@@ -726,7 +722,6 @@
       color: var(--text-muted);
     }
 
-    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -964,7 +959,7 @@
 
     <!-- TAB 3: COMMUNITY DECKS -->
     <div id="community-tab" class="tab-content">
-      <div class="results-info">Daftar Deck Racikan Komunitas Pemain</div>
+      <div class="results-info">Daftar Deck Racikan Komunitas Pemain (Global Real-time)</div>
       <div class="community-grid" id="community-deck-grid">
         <div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck komunitas yang dipublikasikan.</div>
       </div>
@@ -1038,7 +1033,7 @@
 
     <!-- TAB 5: LEADERBOARD / POWERBOARD -->
     <div id="leaderboard-tab" class="tab-content">
-      <div class="results-info">Powerboard & Peringkat Komunitas Renathea</div>
+      <div class="results-info">Powerboard & Peringkat Komunitas Renathea (Global Auto-Rank)</div>
       <div class="section-box">
         <h2 style="margin-bottom: 16px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Top Powerboard Musim Ini</h2>
         <div class="admin-table-container" style="max-height: none; box-shadow: none; padding: 0;">
@@ -1105,7 +1100,7 @@
             <label>Link Komunitas (WhatsApp / Discord / Maps URL)</label>
             <input type="text" id="dir-link-input" placeholder="https://chat.whatsapp.com/xxx">
           </div>
-          <button class="btn btn-primary" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori</button>
+          <button class="btn btn-primary" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori Cloud</button>
         </div>
 
         <!-- 2. Form Submit Jadwal Renathea Camp -->
@@ -1137,7 +1132,7 @@
             <label>Catatan / Keterangan Tambahan</label>
             <textarea id="camp-desc-input" class="deck-textarea" placeholder="Tuliskan detail tempat, link Discord, atau syarat khusus..."></textarea>
           </div>
-          <button class="btn btn-primary" onclick="submitCampSchedule()">📢 Publikasikan Jadwal</button>
+          <button class="btn btn-primary" onclick="submitCampSchedule()">📢 Publikasikan Jadwal ke Cloud</button>
         </div>
 
         <!-- 3. Form Kelola Leaderboard / Powerboard -->
@@ -1159,7 +1154,7 @@
               <input type="number" id="lb-power-input" value="0">
             </div>
           </div>
-          <button class="btn btn-primary" onclick="submitLeaderboardEntry()">💾 Simpan & Update Ranking</button>
+          <button class="btn btn-primary" onclick="submitLeaderboardEntry()">💾 Simpan & Auto-Rank di Cloud</button>
         </div>
 
         <!-- 4. Form Kelola Database Kartu -->
@@ -1258,14 +1253,12 @@
 
   </div>
 
-  <!-- Banner Kontak Admin -->
   <div class="container">
     <div class="contact-banner">
       Ada kendala, saran, masukan, atau ingin mendaftar Renathea Camp? Silakan hubungi admin melalui Instagram: <a href="https://instagram.com/anthonyagis" target="_blank">@anthonyagis</a>
     </div>
   </div>
 
-  <!-- Detail Modal -->
   <div class="modal-overlay" id="card-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -1278,6 +1271,24 @@
   </div>
 
   <script>
+    // =========================================================================
+    // ⚠️ KONFIGURASI FIREBASE CLOUD FIRESTORE
+    // Gantikan nilai di bawah ini denganfirebaseConfig dari Firebase Console Anda
+    // =========================================================================
+    const firebaseConfig = {
+      apiKey: "PASTE_API_KEY_ANDA_DI_SINI",
+      authDomain: "renathea-cardvault.firebaseapp.com",
+      projectId: "renathea-cardvault",
+      storageBucket: "renathea-cardvault.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+
+    // Inisialisasi Firebase & Firestore
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Data Kartu Default Bawaan Aplikasi
     const defaultCards = [
       {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
       {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
@@ -1362,7 +1373,7 @@
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Temple of Thales","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Protect lain di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Ward Keeper","characterId":"Animatherea - Millice S.","cardId":"RCS - 072 | Standard","category":"Convergence"}
     ];
 
-    let allCards = [];
+    let allCards = [...defaultCards];
     let userDeck = [];
     let communityDecks = [];
     let campSchedules = [];
@@ -1370,42 +1381,71 @@
     let leaderboardData = [];
     let isAdminLoggedIn = false;
 
-    function initCardsData() {
-      const saved = localStorage.getItem('renathea_cards_db');
-      if (saved) {
-        try { allCards = JSON.parse(saved); } catch (e) { allCards = [...defaultCards]; }
-      } else {
-        allCards = [...defaultCards];
-        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
-      }
+    // 1. LISTEN TO COMMUNITY DECKS FROM CLOUD (REAL-TIME)
+    function listenToCommunityDecks() {
+      db.collection("community_decks").orderBy("createdAt", "desc")
+        .onSnapshot((snapshot) => {
+          communityDecks = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID');
+            communityDecks.push({
+              id: doc.id,
+              ...data,
+              updatedAt: dateStr
+            });
+          });
+          renderCommunityDecks();
+        }, (error) => {
+          console.error("Gagal mendengarkan deck komunitas:", error);
+        });
     }
 
-    function initCommunityDecks() {
-      const saved = localStorage.getItem('renathea_community_decks');
-      if (saved) {
-        try { communityDecks = JSON.parse(saved); } catch (e) { communityDecks = []; }
-      }
+    // 2. LISTEN TO CAMP DIRECTORY FROM CLOUD (REAL-TIME)
+    function listenToCampDirectories() {
+      db.collection("camp_directories").orderBy("createdAt", "desc")
+        .onSnapshot((snapshot) => {
+          campDirectories = [];
+          snapshot.forEach((doc) => {
+            campDirectories.push({ id: doc.id, ...doc.data() });
+          });
+          renderCampDirectories();
+        }, (error) => {
+          console.error("Gagal mendengarkan direktori camp:", error);
+        });
     }
 
-    function initCampSchedules() {
-      const saved = localStorage.getItem('renathea_camp_schedules');
-      if (saved) {
-        try { campSchedules = JSON.parse(saved); } catch (e) { campSchedules = []; }
-      }
+    // 3. LISTEN TO CAMP SCHEDULES FROM CLOUD (REAL-TIME)
+    function listenToCampSchedules() {
+      db.collection("camp_schedules").orderBy("createdAt", "desc")
+        .onSnapshot((snapshot) => {
+          campSchedules = [];
+          snapshot.forEach((doc) => {
+            campSchedules.push({ id: doc.id, ...doc.data() });
+          });
+          renderCampSchedules();
+        }, (error) => {
+          console.error("Gagal mendengarkan jadwal camp:", error);
+        });
     }
 
-    function initCampDirectories() {
-      const saved = localStorage.getItem('renathea_camp_dirs');
-      if (saved) {
-        try { campDirectories = JSON.parse(saved); } catch (e) { campDirectories = []; }
-      }
-    }
-
-    function initLeaderboard() {
-      const saved = localStorage.getItem('renathea_leaderboard');
-      if (saved) {
-        try { leaderboardData = JSON.parse(saved); } catch (e) { leaderboardData = []; }
-      }
+    // 4. LISTEN TO LEADERBOARD FROM CLOUD (REAL-TIME & AUTO RANK)
+    function listenToLeaderboard() {
+      db.collection("leaderboard").orderBy("power", "desc")
+        .onSnapshot((snapshot) => {
+          leaderboardData = [];
+          let rankIndex = 1;
+          snapshot.forEach((doc) => {
+            leaderboardData.push({
+              id: doc.id,
+              rank: rankIndex++,
+              ...doc.data()
+            });
+          });
+          renderLeaderboardTable();
+        }, (error) => {
+          console.error("Gagal mendengarkan leaderboard:", error);
+        });
     }
 
     function formatSkillText(skillText) {
@@ -1437,6 +1477,7 @@
       applyFilters(context);
     }
 
+    // TAB DATABASE KARTU: TANPA TOMBOL TAMBAH DECK
     function renderCards(cards) {
       const grid = document.getElementById('card-grid');
       const countLabel = document.getElementById('results-count');
@@ -1475,6 +1516,7 @@
       });
     }
 
+    // TAB DECK BUILDER: DENGAN TOMBOL TAMBAH DECK
     function renderDeckAvailableGrid(cards) {
       const grid = document.getElementById('deck-available-grid');
       const countLabel = document.getElementById('deck-results-count');
@@ -1597,31 +1639,34 @@
       });
     }
 
-    /* DI-UPDATE: VALIDASI HARUS 9 KARTU DIBUTUHKAN UNTUK SIMPAN/PUBLIKASI */
+    // PUBLIKASI DECK KE CLOUD FIRESTORE (WAJIB 9 KARTU)
     function publishDeckToCommunity() {
       const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
       const deckNote = document.getElementById('deck-note-input').value.trim();
 
-      // Pengecekan jumlah kartu di deck
       if (userDeck.length < 9) {
         alert(`⚠️ Deck belum lengkap! Harus berisi persis 9 kartu untuk dipublikasikan. (Saat ini baru ${userDeck.length}/9 kartu)`);
         return;
       }
 
-      const newCommunityDeck = {
-        id: 'deck_' + Date.now(),
+      const newDeck = {
         name: deckName,
         note: deckNote,
         cards: userDeck.map(c => c.cardId),
         totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
         author: "Pemain Komunitas",
-        updatedAt: new Date().toLocaleDateString('id-ID')
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      communityDecks.unshift(newCommunityDeck);
-      localStorage.setItem('renathea_community_decks', JSON.stringify(communityDecks));
-      alert(`🌐 Berhasil dipublikasikan ke tab Deck Komunitas!`);
-      switchMainTab('community-tab');
+      db.collection("community_decks").add(newDeck)
+        .then(() => {
+          alert("🌐 Berhasil dipublikasikan ke server cloud global!");
+          switchMainTab('community-tab');
+        })
+        .catch((err) => {
+          console.error("Gagal menyimpan ke cloud:", err);
+          alert("❌ Gagal terhubung ke server cloud! Periksa koneksi internet atau konfigurasi Firebase.");
+        });
     }
 
     function renderCommunityDecks() {
@@ -1672,14 +1717,14 @@
     }
 
     function deleteCommunityDeck(deckId) {
-      if (confirm("Hapus deck ini sebagai admin?")) {
-        communityDecks = communityDecks.filter(d => d.id !== deckId);
-        localStorage.setItem('renathea_community_decks', JSON.stringify(communityDecks));
-        renderCommunityDecks();
+      if (confirm("Hapus deck ini dari cloud server sebagai admin?")) {
+        db.collection("community_decks").doc(deckId).delete()
+          .then(() => alert("✅ Deck berhasil dihapus dari cloud!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
       }
     }
 
-    /* CAMP DIRECTORY & SCHEDULE LOGIC */
+    // CAMP DIRECTORY LOGIC
     function submitCampDirectory() {
       const name = document.getElementById('dir-name-input').value.trim();
       const captain = document.getElementById('dir-captain-input').value.trim();
@@ -1692,17 +1737,21 @@
         return;
       }
 
-      const newDir = { id: 'dir_' + Date.now(), name, captain, location, schedule, link };
-      campDirectories.unshift(newDir);
-      localStorage.setItem('renathea_camp_dirs', JSON.stringify(campDirectories));
-      alert("✅ Renathea Camp berhasil ditambahkan ke direktori!");
+      const newDir = {
+        name, captain, location, schedule, link,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-      document.getElementById('dir-name-input').value = "";
-      document.getElementById('dir-captain-input').value = "";
-      document.getElementById('dir-location-input').value = "";
-      document.getElementById('dir-schedule-input').value = "";
-      document.getElementById('dir-link-input').value = "";
-      renderCampDirectories();
+      db.collection("camp_directories").add(newDir)
+        .then(() => {
+          alert("✅ Renathea Camp berhasil ditambahkan ke Cloud!");
+          document.getElementById('dir-name-input').value = "";
+          document.getElementById('dir-captain-input').value = "";
+          document.getElementById('dir-location-input').value = "";
+          document.getElementById('dir-schedule-input').value = "";
+          document.getElementById('dir-link-input').value = "";
+        })
+        .catch(err => alert("❌ Gagal menyimpan: " + err.message));
     }
 
     function renderCampDirectories() {
@@ -1730,13 +1779,14 @@
     }
 
     function deleteCampDirectory(id) {
-      if (confirm("Hapus Camp ini dari direktori?")) {
-        campDirectories = campDirectories.filter(d => d.id !== id);
-        localStorage.setItem('renathea_camp_dirs', JSON.stringify(campDirectories));
-        renderCampDirectories();
+      if (confirm("Hapus Camp ini dari server?")) {
+        db.collection("camp_directories").doc(id).delete()
+          .then(() => alert("✅ Camp berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
       }
     }
 
+    // CAMP SCHEDULE LOGIC
     function submitCampSchedule() {
       const type = document.getElementById('camp-type-input').value;
       const title = document.getElementById('camp-title-input').value.trim();
@@ -1748,14 +1798,19 @@
         return;
       }
 
-      const newSchedule = { id: 'camp_' + Date.now(), type, title, time, desc };
-      campSchedules.unshift(newSchedule);
-      localStorage.setItem('renathea_camp_schedules', JSON.stringify(campSchedules));
-      alert("📢 Jadwal Renathea Camp berhasil dipublikasikan!");
-      document.getElementById('camp-title-input').value = "";
-      document.getElementById('camp-time-input').value = "";
-      document.getElementById('camp-desc-input').value = "";
-      renderCampSchedules();
+      const newSchedule = {
+        type, title, time, desc,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection("camp_schedules").add(newSchedule)
+        .then(() => {
+          alert("📢 Jadwal Renathea Camp berhasil dipublikasikan ke Cloud!");
+          document.getElementById('camp-title-input').value = "";
+          document.getElementById('camp-time-input').value = "";
+          document.getElementById('camp-desc-input').value = "";
+        })
+        .catch(err => alert("❌ Gagal mempublikasikan: " + err.message));
     }
 
     function renderCampSchedules() {
@@ -1785,14 +1840,14 @@
     }
 
     function deleteCampSchedule(id) {
-      if (confirm("Hapus jadwal ini?")) {
-        campSchedules = campSchedules.filter(s => s.id !== id);
-        localStorage.setItem('renathea_camp_schedules', JSON.stringify(campSchedules));
-        renderCampSchedules();
+      if (confirm("Hapus jadwal ini dari server?")) {
+        db.collection("camp_schedules").doc(id).delete()
+          .then(() => alert("✅ Jadwal berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
       }
     }
 
-    /* LEADERBOARD / POWERBOARD LOGIC */
+    // LEADERBOARD LOGIC
     function submitLeaderboardEntry() {
       const name = document.getElementById('lb-name-input').value.trim();
       const camp = document.getElementById('lb-camp-input').value.trim();
@@ -1803,21 +1858,19 @@
         return;
       }
 
-      leaderboardData = leaderboardData.filter(p => p.name.toLowerCase() !== name.toLowerCase());
-      leaderboardData.push({ name, camp, power });
-      leaderboardData.sort((a, b) => b.power - a.power);
-      leaderboardData.forEach((player, index) => {
-        player.rank = index + 1;
-      });
+      const docId = name.toLowerCase().replace(/\s+/g, '_');
 
-      localStorage.setItem('renathea_leaderboard', JSON.stringify(leaderboardData));
-      alert("🏆 Peringkat leaderboard berhasil diperbarui dan diurutkan otomatis!");
-      
-      document.getElementById('lb-name-input').value = "";
-      document.getElementById('lb-camp-input').value = "";
-      document.getElementById('lb-power-input').value = "0";
-      
-      renderLeaderboardTable();
+      db.collection("leaderboard").doc(docId).set({
+        name, camp, power,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert("🏆 Leaderboard berhasil diperbarui dan diurutkan otomatis di Cloud!");
+        document.getElementById('lb-name-input').value = "";
+        document.getElementById('lb-camp-input').value = "";
+        document.getElementById('lb-power-input').value = "0";
+      })
+      .catch(err => alert("❌ Gagal memperbarui leaderboard: " + err.message));
     }
 
     function renderLeaderboardTable() {
@@ -1829,7 +1882,7 @@
         return;
       }
 
-      leaderboardData.forEach((player, idx) => {
+      leaderboardData.forEach((player) => {
         const tr = document.createElement('tr');
         const badge = player.rank === 1 ? '🥇 1' : player.rank === 2 ? '🥈 2' : player.rank === 3 ? '🥉 3' : `#${player.rank}`;
         tr.innerHTML = `
@@ -1837,24 +1890,21 @@
           <td style="font-weight: 700; color: #111;">${player.name}</td>
           <td>${player.camp || '-'}</td>
           <td style="font-weight: 600; color: var(--primary);">${player.power} Power</td>
-          <td>${isAdminLoggedIn ? `<button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteLeaderboardEntry(${idx})">Hapus</button>` : '<span style="color:#666; font-size:0.8rem;">Terverifikasi</span>'}</td>
+          <td>${isAdminLoggedIn ? `<button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteLeaderboardEntry('${player.id}')">Hapus</button>` : '<span style="color:#666; font-size:0.8rem;">Terverifikasi</span>'}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function deleteLeaderboardEntry(index) {
-      if (confirm("Hapus pemain ini dari leaderboard?")) {
-        leaderboardData.splice(index, 1);
-        leaderboardData.forEach((player, i) => {
-          player.rank = i + 1;
-        });
-        localStorage.setItem('renathea_leaderboard', JSON.stringify(leaderboardData));
-        renderLeaderboardTable();
+    function deleteLeaderboardEntry(docId) {
+      if (confirm("Hapus pemain ini dari leaderboard cloud?")) {
+        db.collection("leaderboard").doc(docId).delete()
+          .then(() => alert("✅ Pemain berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
       }
     }
 
-    /* ADMIN AUTH & DASHBOARD LOGIC */
+    // ADMIN DASHBOARD LOGIC
     function checkAdminAuthStatus() {
       const loginBox = document.getElementById('admin-login-box');
       const dashBox = document.getElementById('admin-dashboard-box');
@@ -1933,9 +1983,9 @@
       if (editIndex >= 0) { allCards[editIndex] = cardData; alert("✅ Kartu diperbarui!"); }
       else { allCards.push(cardData); alert("✅ Kartu ditambahkan!"); }
 
-      localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
       resetAdminForm();
       renderAdminTable();
+      renderCards(allCards);
     }
 
     function editCard(index) {
@@ -1958,8 +2008,8 @@
     function deleteCard(index) {
       if (confirm("Hapus kartu ini?")) {
         allCards.splice(index, 1);
-        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
         renderAdminTable();
+        renderCards(allCards);
       }
     }
 
@@ -1973,8 +2023,8 @@
     function resetToDefaultData() {
       if (confirm("Reset database ke awal?")) {
         allCards = [...defaultCards];
-        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
         renderAdminTable();
+        renderCards(allCards);
         alert("✅ Database direset.");
       }
     }
@@ -2007,12 +2057,11 @@
 
     function closeModal() { document.getElementById('card-modal').classList.remove('active'); }
 
-    // Init
-    initCardsData();
-    initCommunityDecks();
-    initCampSchedules();
-    initCampDirectories();
-    initLeaderboard();
+    // INITIALIZATION (MEMANGGIL REALTIME LISTENER CLOUD)
+    listenToCommunityDecks();
+    listenToCampDirectories();
+    listenToCampSchedules();
+    listenToLeaderboard();
     renderCards(allCards);
   </script>
 </body>
