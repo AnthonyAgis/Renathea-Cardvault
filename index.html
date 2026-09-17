@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Renathea Cardvault - Card Search, Deckbuilder, Camp & Leaderboard</title>
+  <style>
+    :root {
+      --primary: #e60012;
+      --primary-dark: #cc0010;
+      --bg-color: #f4f5f7;
+      --card-bg: #ffffff;
+      --text-main: #2b2b2b;
+      --text-muted: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    header {
+      background-color: #1a1a1a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 4px solid var(--primary);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+
+    /* Tab Navigasi Utama */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      background: #252525;
+      gap: 6px;
+      padding: 8px 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab-btn {
+      padding: 8px 14px;
+      background: transparent;
+      color: #ccc;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 24px auto;
+      padding: 0 20px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Search & Filter Panel */
+    .search-panel {
+      background-color: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .search-main-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+
+    .search-main-input:focus {
+      border-color: var(--primary);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-input-group label, .admin-form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .search-input-group select, .admin-form-group input, .admin-form-group textarea, .admin-form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+
+    .filter-group-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .chip-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border-color);
+      background-color: #f8f9fa;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      color: #444;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .chip-btn.active {
+      background-color: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(230, 0, 18, 0.3);
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 16px;
+    }
+
+    .btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background-color: #e0e0e0;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: #d0d0d0;
+    }
+
+    .btn-danger {
+      background-color: #ff4d4f;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background-color: #d9363e;
+    }
+
+    .btn-add-deck {
+      margin-top: 10px;
+      width: 100%;
+      background: #111;
+      color: #fff;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add-deck:hover {
+      background: var(--primary);
+    }
+
+    /* Results Stats */
+    .results-info {
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Card Grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .tcg-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tcg-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-image {
+      height: 200px;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .card-image-placeholder {
+      font-weight: bold;
+      color: #888;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .card-category-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #111;
+    }
+
+    .card-id {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .card-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+
+    .card-meta span {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .card-skill-box {
+      font-size: 0.82rem;
+      color: #2b2b2b;
+      line-height: 1.4;
+      background: #fafafa;
+      border-left: 3px solid var(--primary);
+      padding: 8px 10px;
+      border-radius: 0 4px 4px 0;
+      margin-top: auto;
+    }
+
+    .skill-line {
+      margin-bottom: 6px;
+    }
+
+    .skill-line:last-child {
+      margin-bottom: 0;
+    }
+
+    /* DECK BUILDER STYLING */
+    .deck-builder-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+    }
+
+    .deck-panel {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .deck-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .deck-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .deck-textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .deck-stats {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .deck-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .deck-card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .deck-card-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .deck-card-name {
+      font-weight: 700;
+      color: #111;
+    }
+
+    .deck-card-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .btn-remove-card {
+      background: #ff4d4f;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .deck-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* COMMUNITY DECKS TAB STYLING */
+    .community-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .community-deck-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .community-deck-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .community-deck-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .community-deck-note {
+      font-size: 0.85rem;
+      color: #444;
+      background: #f8f9fa;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      min-height: 40px;
+    }
+
+    .community-card-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      max-height: 160px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+    }
+
+    .community-card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+
+    /* CAMP TAB & DIRECTORY STYLING */
+    .camp-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .camp-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      border-top: 5px solid var(--primary);
+    }
+
+    .camp-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    .camp-card ul {
+      padding-left: 20px;
+      font-size: 0.88rem;
+      color: #444;
+    }
+
+    .camp-card li {
+      margin-bottom: 8px;
+    }
+
+    .section-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .camp-directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .camp-directory-card {
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .camp-directory-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 6px;
+    }
+
+    .camp-directory-meta {
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .camp-link-btn {
+      margin-top: auto;
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .camp-link-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .schedule-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .schedule-item:last-child {
+      border-bottom: none;
+    }
+
+    /* CONTACT BANNER */
+    .contact-banner {
+      background: #1a1a1a;
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-top: 30px;
+      font-size: 0.9rem;
+    }
+
+    .contact-banner a {
+      color: var(--primary);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .contact-banner a:hover {
+      text-decoration: underline;
+    }
+
+    /* ADMIN LOGIN & DASHBOARD STYLING */
+    .admin-auth-box {
+      max-width: 400px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .admin-form-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      height: fit-content;
+    }
+
+    .admin-table-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      max-height: 700px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: var(--radius);
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #888;
+    }
+
+    .modal-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .modal-grid div {
+      font-size: 0.9rem;
+    }
+
+    .modal-grid label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .deck-builder-layout, .admin-layout {
+        grid-template-columns: 1fr;
+      }
+      .deck-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>RENATHEA CARDVAULT</h1>
+    <p>Portal Database Kartu, Deck Builder, Renathea Camp & Powerboard Leaderboard</p>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="nav-tab-btn active" onclick="switchMainTab('search-tab')">🔍 Database Kartu</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('deck-tab')">🃏 Deck Builder</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('community-tab')">👥 Deck Komunitas</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('camp-tab')">🏟️ Renathea Camp</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('leaderboard-tab')">🏆 Leaderboard</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('admin-tab')">⚙️ Admin Dashboard</button>
+  </div>
+
+  <div class="container">
+    
+    <!-- TAB 1: CARD DATABASE & SEARCH -->
+    <div id="search-tab" class="tab-content active">
+      <div class="search-panel">
+        <input type="text" id="search-input" class="search-main-input" placeholder="Cari nama kartu, skill, keyword, atau ID..." oninput="applyFilters('search')" />
+
+        <div class="search-row">
+          <div class="search-input-group">
+            <label for="category-select">Kategori Kartu</label>
+            <select id="category-select" onchange="applyFilters('search')">
+              <option value="">Semua Kategori</option>
+              <option value="Exclusive">Exclusive</option>
+              <option value="Promotion">Promotion</option>
+              <option value="Convergence">Convergence</option>
+            </select>
+          </div>
+          <div class="search-input-group">
+            <label for="set-select">Nama Set</label>
+            <select id="set-select" onchange="applyFilters('search')">
+              <option value="">Semua Set</option>
+              <option value="In_Sans_">In_Sans_</option>
+              <option value="Jolly Robin">Jolly Robin</option>
+              <option value="Sol Mortuus">Sol Mortuus</option>
+              <option value="Afda Tri">Afda Tri</option>
+              <option value="Comolo">Comolo</option>
+              <option value="Animatherea">Animatherea</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-group-title">Role Kartu</div>
+        <div class="chip-group" id="role-chips">
+          <button class="chip-btn" data-value="Agility" onclick="toggleChip(this, 'search')">Agility</button>
+          <button class="chip-btn" data-value="Melee" onclick="toggleChip(this, 'search')">Melee</button>
+          <button class="chip-btn" data-value="Ranged" onclick="toggleChip(this, 'search')">Ranged</button>
+          <button class="chip-btn" data-value="Magic" onclick="toggleChip(this, 'search')">Magic</button>
+          <button class="chip-btn" data-value="Support" onclick="toggleChip(this, 'search')">Support</button>
+          <button class="chip-btn" data-value="Tank" onclick="toggleChip(this, 'search')">Tank</button>
+        </div>
+
+        <div class="filter-group-title">Keyword Kartu</div>
+        <div class="chip-group" id="keyword-chips">
+          <button class="chip-btn" data-value="Passive" onclick="toggleChip(this, 'search')">Passive</button>
+          <button class="chip-btn" data-value="Powerup" onclick="toggleChip(this, 'search')">Powerup</button>
+          <button class="chip-btn" data-value="Copy" onclick="toggleChip(this, 'search')">Copy</button>
+          <button class="chip-btn" data-value="Silence" onclick="toggleChip(this, 'search')">Silence</button>
+          <button class="chip-btn" data-value="Protect" onclick="toggleChip(this, 'search')">Protect</button>
+          <button class="chip-btn" data-value="Law" onclick="toggleChip(this, 'search')">Law</button>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn btn-secondary" onclick="resetFilters('search')">Reset Filter</button>
+        </div>
+      </div>
+
+      <div class="results-info" id="results-count">Menampilkan 0 kartu</div>
+      <div class="card-grid" id="card-grid"></div>
+    </div>
+
+    <!-- TAB 2: DECK BUILDER -->
+    <div id="deck-tab" class="tab-content">
+      <div class="deck-builder-layout">
+        <div class="deck-panel">
+          <div class="deck-header">
+            <h2>Deck Anda</h2>
+          </div>
+
+          <label style="font-size:0.8rem; font-weight:600; color:#555;">NAMA DECK</label>
+          <input type="text" id="deck-name-input" class="deck-input" placeholder="Masukkan Nama Deck..." value="Deck Utama Saya" />
+
+          <label style="font-size:0.8rem; font-weight:600; color:#555;">CATATAN / STRATEGI DECK</label>
+          <textarea id="deck-note-input" class="deck-textarea" placeholder="Tuliskan racikan atau strategi deck kamu di sini..."></textarea>
+
+          <div class="deck-stats">
+            <span>Jumlah Kartu: <strong id="deck-card-count">0/9</strong></span>
+            <span>Total Power: <strong id="deck-total-power">0</strong></span>
+          </div>
+
+          <div class="deck-card-list" id="deck-card-list">
+            <div style="text-align: center; color: #888; font-size:0.85rem; padding: 20px 0;">Deck masih kosong. Tambahkan kartu dari daftar di sebelah kanan.</div>
+          </div>
+
+          <div class="deck-actions">
+            <button class="btn btn-primary" style="flex:1;" onclick="publishDeckToCommunity()">🌐 Publikasikan ke Komunitas</button>
+            <button class="btn btn-secondary" onclick="clearCurrentDeck()">Kosongkan</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="search-panel">
+            <input type="text" id="deck-search-input" class="search-main-input" placeholder="Cari kartu untuk deck..." oninput="applyFilters('deck')" />
+
+            <div class="search-row">
+              <div class="search-input-group">
+                <label for="deck-category-select">Kategori Kartu</label>
+                <select id="deck-category-select" onchange="applyFilters('deck')">
+                  <option value="">Semua Kategori</option>
+                  <option value="Exclusive">Exclusive</option>
+                  <option value="Promotion">Promotion</option>
+                  <option value="Convergence">Convergence</option>
+                </select>
+              </div>
+              <div class="search-input-group">
+                <label for="deck-set-select">Nama Set</label>
+                <select id="deck-set-select" onchange="applyFilters('deck')">
+                  <option value="">Semua Set</option>
+                  <option value="In_Sans_">In_Sans_</option>
+                  <option value="Jolly Robin">Jolly Robin</option>
+                  <option value="Sol Mortuus">Sol Mortuus</option>
+                  <option value="Afda Tri">Afda Tri</option>
+                  <option value="Comolo">Comolo</option>
+                  <option value="Animatherea">Animatherea</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="filter-group-title">Role Kartu</div>
+            <div class="chip-group" id="deck-role-chips">
+              <button class="chip-btn" data-value="Agility" onclick="toggleChip(this, 'deck')">Agility</button>
+              <button class="chip-btn" data-value="Melee" onclick="toggleChip(this, 'deck')">Melee</button>
+              <button class="chip-btn" data-value="Ranged" onclick="toggleChip(this, 'deck')">Ranged</button>
+              <button class="chip-btn" data-value="Magic" onclick="toggleChip(this, 'deck')">Magic</button>
+              <button class="chip-btn" data-value="Support" onclick="toggleChip(this, 'deck')">Support</button>
+              <button class="chip-btn" data-value="Tank" onclick="toggleChip(this, 'deck')">Tank</button>
+            </div>
+
+            <div class="filter-group-title">Keyword Kartu</div>
+            <div class="chip-group" id="deck-keyword-chips">
+              <button class="chip-btn" data-value="Passive" onclick="toggleChip(this, 'deck')">Passive</button>
+              <button class="chip-btn" data-value="Powerup" onclick="toggleChip(this, 'deck')">Powerup</button>
+              <button class="chip-btn" data-value="Copy" onclick="toggleChip(this, 'deck')">Copy</button>
+              <button class="chip-btn" data-value="Silence" onclick="toggleChip(this, 'deck')">Silence</button>
+              <button class="chip-btn" data-value="Protect" onclick="toggleChip(this, 'deck')">Protect</button>
+              <button class="chip-btn" data-value="Law" onclick="toggleChip(this, 'deck')">Law</button>
+            </div>
+
+            <div class="filter-actions">
+              <button class="btn btn-secondary" onclick="resetFilters('deck')">Reset Filter</button>
+            </div>
+          </div>
+
+          <div class="results-info" id="deck-results-count">Menampilkan 0 kartu</div>
+          <div class="card-grid" id="deck-available-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: COMMUNITY DECKS -->
+    <div id="community-tab" class="tab-content">
+      <div class="results-info">Daftar Deck Racikan Komunitas Pemain</div>
+      <div class="community-grid" id="community-deck-grid">
+        <div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck komunitas yang dipublikasikan.</div>
+      </div>
+    </div>
+
+    <!-- TAB 4: RENATHEA CAMP -->
+    <div id="camp-tab" class="tab-content">
+      <div class="results-info">Aturan Kompetisi & Direktori Renathea Camp</div>
+      <div class="camp-info-grid">
+        <div class="camp-card">
+          <h3>🏟️ OnCamp</h3>
+          <ul>
+            <li>Kompetisi Ranked yang dimainkan secara offline di tingkat Camp.</li>
+            <li>Setiap Camp dapat mengadakan <strong>maksimal 1 OnCamp</strong> setiap pekannya.</li>
+            <li><strong>Syarat:</strong> Minimal 3 pemain. Deck 9 kartu <strong>lock</strong> selama 1 pekan.</li>
+            <li>Maksimal 1 kali gelud per pasangan pemain. Pemenang mendapat <strong>POWERUP (+1)</strong>.</li>
+          </ul>
+        </div>
+        <div class="camp-card">
+          <h3>💻 Campless</h3>
+          <ul>
+            <li>Kompetisi Ranked online via Discord Renathea untuk pemain yang <strong>tidak ikut OnCamp</strong>.</li>
+            <li><strong>Pendaftaran:</strong> Hari Sabtu sebelumnya. <strong>Jadwal Tanding:</strong> Sabtu pukul 17:00–22:00 WIB.</li>
+            <li>Tersedia maksimal 3 voice chat room.</li>
+          </ul>
+        </div>
+        <div class="camp-card">
+          <h3>🏆 TarCamp</h3>
+          <ul>
+            <li>Kompetisi Ranked 3v3 antar-Camp secara online via Discord.</li>
+            <li>Deck dari 3 perwakilan Camp <strong>TIDAK boleh ada yang sama</strong>.</li>
+            <li>Max 1 kali per bulan antar pasangan Camp. Pemenang gelud mendapat <strong>POWERUP (+2)</strong>, pemenang Camp mendapat <strong>(+3)</strong>.</li>
+          </ul>
+        </div>
+        <div class="camp-card">
+          <h3>🌟 Turnamen Nasional</h3>
+          <ul>
+            <li>Kompetisi puncak Renathea di akhir Season (single elimination top 8 Powerboard).</li>
+            <li>Kepesertaan berdasarkan ranking Powerboard (posisi digantikan pemain berikutnya bila berhalangan).</li>
+            <li>Juara 1 mendapat <strong>(+9)</strong>, Juara 2 & 3 masing-masing <strong>(+6)</strong> dan <strong>(+3)</strong>.</li>
+            <li>Pemenang diabadikan menjadi kartu promo/eksklusif pada *Convergence Series* berikutnya beserta fisik kartunya.</li>
+          </ul>
+        </div>
+        <div class="camp-card" style="grid-column: 1 / -1; border-top-color: #d4af37;">
+          <h3>⛺ Jambore Nasional</h3>
+          <ul>
+            <li>Acara puncak Renathea yang diadakan di akhir Season, terbuka untuk semua Camp dan seluruh komunitas Renathea.</li>
+            <li><strong>Agenda Utama:</strong> Turnamen Nasional.</li>
+            <li><strong>Kegiatan Komunitas:</strong> Diisi dengan berbagai keseruan seperti gelaran talkshow dan gelud bebas.</li>
+            <li><em>Informasi lebih detail mengenai Jambore Nasional akan disampaikan kemudian.</em></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Direktori Daftar Camp Resmi -->
+      <div class="section-box">
+        <h2 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Daftar Renathea Camp Resmi</h2>
+        <div class="camp-directory-grid" id="camp-directory-grid">
+          <div style="grid-column: 1/-1; text-align: center; color: #888; padding: 20px;">Belum ada data Camp terdaftar.</div>
+        </div>
+      </div>
+
+      <!-- Jadwal Camp Aktif dari Admin -->
+      <div class="section-box">
+        <h2 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Jadwal Aktif Renathea Camp</h2>
+        <div id="schedule-list-box">
+          <div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan admin.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: LEADERBOARD / POWERBOARD -->
+    <div id="leaderboard-tab" class="tab-content">
+      <div class="results-info">Powerboard & Peringkat Komunitas Renathea</div>
+      <div class="section-box">
+        <h2 style="margin-bottom: 16px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Top Powerboard Musim Ini</h2>
+        <div class="admin-table-container" style="max-height: none; box-shadow: none; padding: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Nama Pemain</th>
+                <th>Camp</th>
+                <th>Total Power / Poin</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-body">
+              <tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan oleh admin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: ADMIN DASHBOARD / LOGIN -->
+    <div id="admin-tab" class="tab-content">
+      
+      <!-- Tampilan Form Login Admin -->
+      <div id="admin-login-box" class="admin-auth-box">
+        <h2 style="margin-bottom: 16px; color: #111;">Admin Login</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Masukkan password admin untuk mengakses panel pengelola.</p>
+        <input type="password" id="admin-pass-input" class="deck-input" placeholder="Password Admin">
+        <button class="btn btn-primary" style="width: 100%; padding: 10px;" onclick="handleAdminLogin()">Masuk Dashboard</button>
+      </div>
+
+      <!-- Tampilan Dashboard Admin (Terproteksi) -->
+      <div id="admin-dashboard-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Panel Pengelola Admin</h2>
+          <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
+        </div>
+
+        <!-- 1. Form Manajemen Daftar Camp -->
+        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
+          <h3 style="margin-bottom: 14px;">🏕️ Tambah / Kelola Renathea Camp Resmi</h3>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Nama Camp</label>
+              <input type="text" id="dir-name-input" placeholder="Misal: Camp Pluit Village">
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Camp Captain</label>
+              <input type="text" id="dir-captain-input" placeholder="Misal: Anton">
+            </div>
+          </div>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Lokasi Titik Kumpul</label>
+              <input type="text" id="dir-location-input" placeholder="Misal: Lantai 2 Foodcourt Pluit Village">
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Jadwal Kumpul</label>
+              <input type="text" id="dir-schedule-input" placeholder="Misal: Setiap Minggu 13:00 WIB">
+            </div>
+          </div>
+          <div class="admin-form-group" style="margin-bottom: 14px;">
+            <label>Link Komunitas (WhatsApp / Discord / Maps URL)</label>
+            <input type="text" id="dir-link-input" placeholder="https://chat.whatsapp.com/xxx">
+          </div>
+          <button class="btn btn-primary" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori</button>
+        </div>
+
+        <!-- 2. Form Submit Jadwal Renathea Camp -->
+        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
+          <h3 style="margin-bottom: 14px;">📅 Publikasikan Jadwal Renathea Camp</h3>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Tipe Kompetisi</label>
+              <select id="camp-type-input">
+                <option value="OnCamp">OnCamp (Tatap Muka)</option>
+                <option value="Campless">Campless (Online Discord)</option>
+                <option value="TarCamp">TarCamp (3v3 Antar-Camp)</option>
+                <option value="Turnamen Nasional">Turnamen Nasional</option>
+                <option value="Jambore Nasional">Jambore Nasional</option>
+              </select>
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Nama Camp / Kegiatan</label>
+              <input type="text" id="camp-title-input" placeholder="Misal: Jambore Nasional Season 1">
+            </div>
+          </div>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Waktu / Tanggal Pelaksanaan</label>
+              <input type="text" id="camp-time-input" placeholder="Misal: Akhir Pekan / Akhir Season">
+            </div>
+          </div>
+          <div class="admin-form-group" style="margin-bottom: 14px;">
+            <label>Catatan / Keterangan Tambahan</label>
+            <textarea id="camp-desc-input" class="deck-textarea" placeholder="Tuliskan detail tempat, link Discord, atau syarat khusus..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="submitCampSchedule()">📢 Publikasikan Jadwal</button>
+        </div>
+
+        <!-- 3. Form Kelola Leaderboard / Powerboard -->
+        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
+          <h3 style="margin-bottom: 14px;">🏆 Tambah / Update Leaderboard Pemain</h3>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Nama Pemain</label>
+              <input type="text" id="lb-name-input" placeholder="Misal: Anton">
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Asal Camp</label>
+              <input type="text" id="lb-camp-input" placeholder="Misal: Camp Pluit Village">
+            </div>
+          </div>
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Total Power / Poin</label>
+              <input type="number" id="lb-power-input" value="0">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="submitLeaderboardEntry()">💾 Simpan & Update Ranking</button>
+        </div>
+
+        <!-- 4. Form Kelola Database Kartu -->
+        <div class="admin-layout">
+          <div class="admin-form-card">
+            <div class="deck-header" style="margin-bottom:12px;">
+              <h2 id="admin-form-title">Tambah Kartu Baru</h2>
+            </div>
+            <input type="hidden" id="admin-edit-index" value="-1">
+
+            <div class="search-row" style="margin-bottom:10px;">
+              <div class="admin-form-group" style="flex:1;">
+                <label>Nama Kartu</label>
+                <input type="text" id="admin-name" placeholder="Misal: Prabu Siliwangi">
+              </div>
+              <div class="admin-form-group" style="flex:1;">
+                <label>Card ID</label>
+                <input type="text" id="admin-cardId" placeholder="Misal: RCS - 001 | Standard">
+              </div>
+            </div>
+
+            <div class="search-row" style="margin-bottom:10px;">
+              <div class="admin-form-group" style="flex:1;">
+                <label>Kategori</label>
+                <select id="admin-category">
+                  <option value="Convergence">Convergence</option>
+                  <option value="Exclusive">Exclusive</option>
+                  <option value="Promotion">Promotion</option>
+                </select>
+              </div>
+              <div class="admin-form-group" style="flex:1;">
+                <label>Nama Set</label>
+                <input type="text" id="admin-set" placeholder="Misal: In_Sans_">
+              </div>
+            </div>
+
+            <div class="search-row" style="margin-bottom:10px;">
+              <div class="admin-form-group" style="flex:1;">
+                <label>Raw Power</label>
+                <input type="number" id="admin-power" value="0">
+              </div>
+              <div class="admin-form-group" style="flex:1;">
+                <label>Class ID</label>
+                <input type="text" id="admin-classId" placeholder="Misal: P1 - Slugger">
+              </div>
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom:10px;">
+              <label>Role Kartu (Pisahkan dengan ' | ')</label>
+              <input type="text" id="admin-role" placeholder="Misal: Tank | Support">
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom:10px;">
+              <label>Keyword Kartu (Pisahkan dengan koma)</label>
+              <input type="text" id="admin-keyword" placeholder="Misal: PROTECT, POWERUP">
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom:10px;">
+              <label>URL Gambar Kartu</label>
+              <input type="text" id="admin-image" placeholder="https://link-gambar.com/kartu.jpg">
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom:14px;">
+              <label>Teks Skill (Gunakan ' | ' untuk pemisah baris)</label>
+              <textarea id="admin-skill" class="deck-textarea" placeholder="PROTECT kartu... | POWERUP..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" style="flex:1;" onclick="saveAdminCard()">💾 Simpan Kartu</button>
+              <button class="btn btn-secondary" onclick="resetAdminForm()">Batal</button>
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <div class="deck-header" style="margin-bottom:12px; display: flex; justify-content: space-between; align-items: center;">
+              <h2>Kelola Data Kartu (<span id="admin-total-count">0</span>)</h2>
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:4px 10px;" onclick="resetToDefaultData()">Reset ke Data Bawaan</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Set</th>
+                  <th>Pwr</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Banner Kontak Admin -->
+  <div class="container">
+    <div class="contact-banner">
+      Ada kendala, saran, masukan, atau ingin mendaftar Renathea Camp? Silakan hubungi admin melalui Instagram: <a href="https://instagram.com/anthonyagis" target="_blank">@anthonyagis</a>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="card-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-header">
+        <h2 id="modal-title">Nama Kartu</h2>
+        <span id="modal-id" style="font-size: 0.85rem; color: #666;">Card ID</span>
+      </div>
+      <div class="modal-grid" id="modal-details"></div>
+    </div>
+  </div>
+
+  <script>
+    const defaultCards = [
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Damar Jati","image":"","power":"7","role":"","keyword":"SILENCE, PROTECT","skill":"SILENCE semua kartu di Arena kamu! | PROTECT semua kartu di Arena lawan!","classId":"P1 - Prisoner","characterId":"Tankcell - Fajri","cardId":"TCS - 003 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Game Director","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu di seluruh Arena!","classId":"P1 - Warlock","characterId":"Tankcell - Adnan","cardId":"TCS - 004 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Community Director","image":"","power":"0","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9).","classId":"P1 - Ranger","characterId":"Tankcell - Dika","cardId":"TCS - 005 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Officer","image":"","power":"5","role":"Tank","keyword":"","skill":"","classId":"P1 - Sentinel","characterId":"Tankcell - Fajri","cardId":"TCS - 006 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Ambarwati","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Jagad Raya - Ambarwati","cardId":"JRE - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Mutiara","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Jagad Raya - Mutiara","cardId":"JRE - 02 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Nayra","image":"","power":"0","role":"Magic","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lain di seluruh Arena! | POWERUP (+2).","classId":"P1 - Sorceress","characterId":"Basundara - Nayra","cardId":"AQR - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Prabu Siliwangi","image":"","power":"3","role":"Tank | Support","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu yang Raw Power-nya terbesar di Arena kamu! | POWERUP (+3) jika kartu ini punya Raw Power terbesar di Arena Kamu>","classId":"P2 - Honor Guard","characterId":"In_Sans_ - Siliwangi","cardId":"RCS - 001 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Kian Santang","image":"","power":"3","role":"Melee","keyword":"POWERUP, SILENCE","skill":"POWERUP (+4) per tiap Melee di Arena lawan. | SILENCE Melee di Arena Lawan!","classId":"P1 - Slugger","characterId":"In_Sans_ - Kian Santang","cardId":"RCS - 002 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Surawisesa","image":"","power":"2","role":"Agility","keyword":"SILENCE, POWERUP","skill":"SILENCE Magic dan Support di Arena Lawan! | POWERUP (+2) per tiap Magic atau Support di Arena lawan.","classId":"P1 - Spellbane","characterId":"In_Sans_ - Surawisesa","cardId":"RCS - 003 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Walangsungsang","image":"","power":"1","role":"Agility | Support","keyword":"PROTECT, SILENCE","skill":"PROTECT kartu yang Raw Power-nya terkecil di Arena kamu! | SILENCE kartu yang Raw Power-nya terbesar di Arena lawan!","classId":"P1 - Handler","characterId":"In_Sans_ - Walangsungsang","cardId":"RCS - 004 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Nyi Roro Kidul","image":"","power":"0","role":"Magic","keyword":"SILENCE","skill":"SILENCE semua kartu lawan!","classId":"P1 - Witch","characterId":"In_Sans_ - Nyi Roro Kidul","cardId":"RCS - 005 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Pohaci","image":"","power":"0","role":"Support","keyword":"PROTECT","skill":"PROTECT semua kartu di Arena kamu!","classId":"P1 - Priest","characterId":"In_Sans_ - Pohaci","cardId":"RCS - 006 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Gold Dragon","image":"","power":"0","role":"Ranged | Magic","keyword":"POWERUP","skill":"POWERUP (+2) per tiap skill di Arena lawan.","classId":"P1 - Arcane Sniper","characterId":"In_Sans_ - Gold Dragon","cardId":"RCS - 007 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Red Amberfield","image":"","power":"3","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+6) jika kartu ini punya Raw Power terbesar di seluruh Arena.","classId":"P1 - Paragon","characterId":"In_Sans_ - Red Amberfield","cardId":"RCS - 008 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Thesera the Divine","image":"","power":"2","role":"Support | Melee","keyword":"LAW, POWERUP","skill":"LAW: Raw Power tiap kartu minimal 3. | POWERUP (+3).","classId":"P2 - Uplifter","characterId":"In_Sans_ - Thesera","cardId":"RCS - 009 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Banas Agni","image":"","power":"2","role":"Melee | Agility | Support","keyword":"POWERUP","skill":"POWERUP (+3X). | X = Raw Power kartu ini.","classId":"P2 - Monk","characterId":"In_Sans_ - Banas Agni","cardId":"RCS - 010 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Zendar","image":"","power":"0","role":"Ranged | Magic | Support","keyword":"POWERUP, POWERUP","skill":"POWERUP (+2) per tiap kartu ter-protect di Arena kamu. | POWERUP (+3) per tiap kartu ter-silence di Arena lawan.","classId":"P1 - Orb Weaver","characterId":"In_Sans_ - Zendar","cardId":"RCS - 011 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Lord Vyke","image":"","power":"4","role":"Magic | Tank","keyword":"LAW, POWERUP","skill":"LAW: Raw Power tiap kartu maksimal 3. | POWERUP (+3).","classId":"P2 - Limiter","characterId":"In_Sans_ - Lord Vyke","cardId":"RCS - 012 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Ziggy The King","image":"","power":"1","role":"Agility | Ranged","keyword":"LAW, POWERUP","skill":"LAW: Semua skill Law dibatalkan. | POWERUP (+4) per tiap skill Law di seluruh Arena.","classId":"P2 - Outlaw","characterId":"Jolly Robin - Ziggy","cardId":"RCS - 013 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Maika","image":"","power":"1","role":"Agility | Ranged","keyword":"SILENCE, POWERUP","skill":"Jika ada 3 atau lebih skill Powerup di Arena lawan. SILENCE semua kartu lawan! | POWERUP (+2) per tiap skill Powerup di Arena lawan.","classId":"P2 - Saboteur","characterId":"Jolly Robin - Maika","cardId":"RCS - 014 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Quickdraw","image":"","power":"2","role":"Agility | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE Tank, Melee, dan Agility di Arena Lawan! | POWERUP (+4)","classId":"P1 - Samurai","characterId":"Jolly Robin - Yukia U.","cardId":"RCS - 015 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Akamaru","image":"","power":"3","role":"Melee","keyword":"POWERUP, POWERUP","skill":"POWERUP (+3) jika Tidak ada Law yang aktif. | POWERUP (+3) per tiap skill Law di Arena lawan.","classId":"P1 - Freefolk","characterId":"Jolly Robin - Akamaru","cardId":"RCS - 016 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Anarai Harpy","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Silence di Arena lawan, PROTECT semua kartu di Arena kamu!","classId":"P1- Warder","characterId":"Jolly Robin - Anarai Harpy","cardId":"RCS - 017 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Golgorbot","image":"","power":"3","role":"Tank | Ranged","keyword":"POWERUP, PROTECT","skill":"POWERUP (+7) jika TIDAK ada skill Powerup lain di Arena kamu.| Jika TIDAK ada skill Protect lain di Arena kamu, PROTECT kartu ini!","classId":"P2 - Cannoneer","characterId":"Jolly Robin - Golgorbot","cardId":"RCS - 018 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"High Priest Urue","image":"","power":"4","role":"","keyword":"LAW, POWERUP","skill":"LAW: Total Power tiap pemain maksimal 15. | POWERUP (.2).","classId":"P2 - Arbitrator","characterId":"Jolly Robin - High Priest Urue","cardId":"RCS - 019 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Jamaroon Manhunter","image":"","power":"2","role":"Magic | Agility","keyword":"SILENCE","skill":"SILENCE kartu yang Raw Power-nya ganjil di Arena lawan!","classId":"P1 - Shade","characterId":"Jolly Robin - Manhunter","cardId":"RCS - 020 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Land Scout Georgie","image":"","power":"0","role":"Support","keyword":"PROTECT","skill":"PROTECT kartu lain di Arena kamu!","classId":"P1 - Priestess","characterId":"Jolly Robin - Georgie","cardId":"RCS - 021 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Space Pixie Faleria","image":"","power":"1","role":"Ranged","keyword":"POWERUP, SILENCE","skill":"POWERUP (+5) per tiap Melee dan Tank di Arena lawan. | SILENCE Melee dan Tank di Arena lawan!","classId":"P1 - Trapper","characterId":"Jolly Robin - Faleria","cardId":"RCS - 022 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Xentharium Primagora","image":"","power":"6","role":"Tank | Magic","keyword":"SILENCE","skill":"SILENCE kartu lain di Arena kamu!","classId":"P1 - Death Knight","characterId":"Jolly Robin - Primagora","cardId":"RCS - 023 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Jolly Robin","illustrator":"Reginald Manafe","name":"Yakshara Sashi","image":"","power":"1","role":"","keyword":"LAW, SILENCE","skill":"LAW: Total Power tiap pemain minimal15. | SILENCE semua kartu lawan!","classId":"P2 - Proctor","characterId":"Jolly Robin - Yakshara S.","cardId":"RCS - 024 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Assassin","image":"","power":"2","role":"Magic | Agility","keyword":"SILENCE","skill":"SILENCE kartu yang Raw Power-nya genap di Aena lawan!","classId":"P1 - Phantom","characterId":"Sol Mortuus - Assassin","cardId":"RCS - 025 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Berserker","image":"","power":"3","role":"Melee","keyword":"POWERUP, PROTECT","skill":"POWERUP (+4) jika ada skill Silence di Arena lawan. | PROTECT kartu ini!","classId":"P1 - Brute","characterId":"Sol Mortuus - Berserker","cardId":"RCS - 026 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Doctor","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Sol Mortuus - Doctor","cardId":"RCS - 027 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Emperor","image":"","power":"0","role":"Support","keyword":"POWERUP","skill":"POWERUP (+10) jika TIDAK ada skill Silence di Arena kamu.","classId":"P1 - Pacifist","characterId":"Sol Mortuus - Emperor","cardId":"RCS - 028 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Gate","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika TIDAK ada skill Silence di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Cleric","characterId":"Sol Mortuus - Gate","cardId":"RCS - 029 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Knight","image":"","power":"2","role":"Agility | Melee","keyword":"POWERUP","skill":"POWERUP (+4) per tiap kartu ter-silence di Arena lawan.","classId":"P1 - Reaver","characterId":"Sol Mortuus - Knight","cardId":"RCS - 030 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Lamb","image":"","power":"2","role":"Agility","keyword":"SILENCE","skill":"SILENCE kartu yang TIDAK punya skill Silence atau Protect di Arena lawan!","classId":"P1 - Stalker","characterId":"Sol Mortuus - Lamb","cardId":"RCS - 031 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Mercenary","image":"","power":"4","role":"Tank","keyword":"PROTECT","skill":"Jika hanya ada 1 kartu yang punya skill Powerup di Arena kamu, PROTECT kartu tersebut!","classId":"P1 - Bodyguard","characterId":"Sol Mortuus - Mercenary","cardId":"RCS - 032 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Messenger","image":"","power":"1","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9) jika TIDAK ada skill Silence di Arena lawan.","classId":"P1 - Gunner","characterId":"Sol Mortuus - Messenger","cardId":"RCS - 033 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Preacher","image":"","power":"1","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9) jika TIDAK ada skill Silence di Arena lawan.","classId":"P1- Ace","characterId":"Sol Mortuus - Preacher","cardId":"RCS - 034 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Prophet","image":"","power":"0","role":"Magic | Support","keyword":"LAW, POWERUP","skill":"LAW: Semua kata \"TIDAK\" dihapus dari teks skill. | POWERUP (+9) jika TIDAK ada skill Powerup lain di Arena kamu.","classId":"P2 - Technomancer","characterId":"Sol Mortuus - Prophet","cardId":"RCS - 035 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Sol Mortuus","illustrator":"Aryan Kush","name":"The Throne","image":"","power":"0","role":"Magic | Support","keyword":"SILENCE, PROTECT","skill":"SILENCE Melee dan Ranged di Arena lawan! | PROTECT Melee dan Ranged di Arena kamu!","classId":"P1 - Warcaster","characterId":"Sol Mortuus - Throne","cardId":"RCS - 036 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Ares","image":"","power":"2","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+3) per tiap kartu ter-protect di Arena lawan.","classId":"P1 - Ravager","characterId":"Afda Tri - Ares","cardId":"RCS - 037 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Artemis","image":"","power":"1","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+X). | X = Total Raw Power di Arena kamu.","classId":"P2 - Beastmaster","characterId":"Afda Tri - Artemis","cardId":"RCS - 038 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Athena","image":"","power":"4","role":"Tank","keyword":"PROTECT","skill":"Jika hanya ada 1 kartu yang Raw Power-nya 2 atau kurang di Arena kamu, PROTECT kartu tersebut!","classId":"P1 - Shieldbearer","characterId":"Afda Tri - Athena","cardId":"RCS - 039 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Cella","image":"","power":"2","role":"Melee | Magic","keyword":"POWERUP","skill":"POWERUP (+3) per tiap kartu ter-silence di seluruh Arena.","classId":"P1 - Hexblade","characterId":"Afda Tri - Cella","cardId":"RCS - 040 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Corldbeg","image":"","power":"5","role":"Tank","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Iron Guardian","characterId":"Afda Tri - Corldbeg","cardId":"RCS - 041 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Efreet","image":"","power":"6","role":"Tank | Magic","keyword":"SILENCE","skill":"SILENCE semua kartu di Arena kamu!","classId":"P1 - Dark Knight","characterId":"Afda Tri - Efreet","cardId":"RCS - 042 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Golba","image":"","power":"2","role":"Ranged | Melee","keyword":"POWERUP","skill":"POWERUP (+X). | X = Total Raw Power di Arena lawan.","classId":"P2 - Musketeer","characterId":"Afda Tri - Golba","cardId":"RCS - 043 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Kamikaze","image":"","power":"2","role":"Agility","keyword":"SILENCE","skill":"SILENCE Ranged, Magic, dan Support di Arena lawan!","classId":"P1 - Shadowblade","characterId":"Afda Tri - Kamikaze","cardId":"RCS - 044 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Kazakh","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu yang Raw Power-nya terkecil di Arena kamu! | POWERUP (+2X). | X = Raw Power terkecil di Arena kamu.","classId":"P2 - Custodian","characterId":"Afda Tri - Kazakh","cardId":"RCS - 045 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Mercury","image":"","power":"6","role":"Tank | Support","keyword":"PROTECT","skill":"PROTECT semua kartu di Arena lawan!","classId":"P1 - Holy Knight","characterId":"Afda Tri - Mercury","cardId":"RCS - 046 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Mugenjou","image":"","power":"4","role":"Melee | Tank","keyword":"SILENCE","skill":"Jika ada skill Protect di Arena lawan, SILENCE semua kartu di lawan!","classId":"P1 - Bulldozer","characterId":"Afda Tri - Mugenjou","cardId":"RCS - 047 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Taurus","image":"","power":"2","role":"Magic | Melee","keyword":"LAW","skill":"LAW: TIDAK ada skill Powerup.","classId":"P2 - Battlemage","characterId":"Afda Tri - Taurus","cardId":"RCS - 048 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Mosquito Man","image":"","power":"2","role":"Agility | Magic","keyword":"SILENCE","skill":"SILENCE Ranged dan Melee di Arena lawan!","classId":"P1 - Shadow","characterId":"Comolo - Mosquito Man","cardId":"RCS - 049 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"The Huntress","image":"","power":"2","role":"Agility | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu yang Raw Power-nya terkecil di Arena lawan! | POWERUP (+X). | X = Raw Power terbesar di Arena lawan.","classId":"P2 - Swashbuckler","characterId":"Comolo - The Huntress","cardId":"RCS - 050 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Barong","image":"","power":"4","role":"Tank | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu yang Raw Power-nya terbesar di Arena lawan! | POWERUP (+X). | X = Raw Power terkecil di Arena lawan.","classId":"P2 - Dreadnought","characterId":"Comolo - Barong","cardId":"RCS - 051 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Zinaida","image":"","power":"1","role":"Support","keyword":"PROTECT","skill":"PROTECT kartu yang Raw Power-nya genap di Arena Kamu!","classId":"P1 - Evenkeeper","characterId":"Comolo - Zinaida","cardId":"RCS - 052 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Gasman","image":"","power":"3","role":"Melee","keyword":"SILENCE, POWERUP","skill":"Jika ada Melee lain di Arena kamu, SILENCE semua kartu di Arena kamu! | POWERUP (+5).","classId":"P1 - Rival","characterId":"Comolo - Gasman","cardId":"RCS - 053 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Mo5es","image":"","power":"1","role":"Support | Magic","keyword":"LAW, POWERUP","skill":"LAW: Semua nilai Powerup (+?) berubah menjadi (+3), teks lainnya tetap sama. | POWERUP (+0) per tiap kartu di Arena kamu.","classId":"P2 - Artificer","characterId":"Comolo - Mo5es","cardId":"RCS - 054 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Skulldog","image":"","power":"2","role":"Agility","keyword":"SILENCE","skill":"Jika ada skill Silence lain di Arena kamu, SILENCE semua kartu lawan!","classId":"P1 - Nightblade","characterId":"Comolo - Skulldog","cardId":"RCS - 055 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Clobber","image":"","power":"4","role":"Tank","keyword":"PROTECT, POWERUP","skill":"Jika ada Agility di Arena lawan, PROTECT Ranged di Arena kamu! | POWERUP (+1) per tiap Agility di Arena lawan.","classId":"P1 - Warden","characterId":"Comolo - Clobber","cardId":"RCS - 056 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Trap Leader","image":"","power":"2","role":"Ranged | Melee","keyword":"POWERUP","skill":"POWERUP (+1) per tiap kartu di seluruh Arena.","classId":"P1 - Warmonger","characterId":"Comolo - Trap Leader","cardId":"RCS - 057 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Trap Operator","image":"","power":"0","role":"Ranged | Support","keyword":"POWERUP","skill":"POWERUP (+2) per tiap kartu ter-protect di seluruh Arena.","classId":"P1 - Fire Support","characterId":"Comolo - Trap Operator","cardId":"RCS - 058 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"The Tower","image":"","power":"0","role":"Magic","keyword":"LAW, POWERUP","skill":"LAW: Semua kondisi \"jika\" pada skill dianggap TIDAK terpenuhi. | POWERUP (+5).","classId":"P2 - Dogmatist","characterId":"Comolo - The Tower","cardId":"RCS - 059 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Twin Killer","image":"","power":"2","role":"Ranged | Agility","keyword":"POWERUP","skill":"POWERUP (+1) per tiap skill Powerup di seluruh Arena.","classId":"P1 - Hotshot","characterId":"Comolo - Twin Killer","cardId":"RCS - 060 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Maya Melves","image":"","power":"1","role":"Magic | Ranged","keyword":"POWERUP","skill":"POWERUP (+10) jika TIDAK ada skill Protect di Arena kamu.","classId":"P1 - Spellpiercer","characterId":"Animatherea - Maya M.","cardId":"RCS - 061 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Canna","image":"","power":"2","role":"Agility","keyword":"SILENCE","skill":"Jika TIDAK ada Tank di Arena lawan, SILENCE semua kartu lawan!","classId":"P1 - Rascal","characterId":"Animatherea - Canna","cardId":"RCS - 062 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Maiden of Konbea","image":"","power":"0","role":"Support","keyword":"PROTECT, POWERUP","skill":"PROTECT semua kartu di Arena lawan! | POWERUP (+10).","classId":"P1 - Altruist","characterId":"Animatherea - Shanti","cardId":"RCS - 063 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"High Priestess Agatha","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Animatherea - Agatha","cardId":"RCS - 064 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Irja","image":"","power":"0","role":"Magic","keyword":"LAW, POWERUP","skill":"LAW: Semua kartu punya Raw Power 0. | POWERUP (+4) per tiap Tank di seluruh Arena.","classId":"P2 - Blood Mage","characterId":"Animatherea - Irja","cardId":"RCS - 065 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Guinevere","image":"","power":"2","role":"Agility","keyword":"SILENCE","skill":"Jika ada 5 atau lebih skill di Arena lawan, SILENCE semua kartu lawan!","classId":"P1 - Agent","characterId":"Animatherea - Guinevere","cardId":"RCS - 066 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Knight of Eternity","image":"","power":"3","role":"Melee | Magic","keyword":"POWERUP, SILENCE","skill":"POWERUP (+5). | SILENCE kartu ini!","classId":"P1 - Spellword","characterId":"Animatherea - Philiatus V.","cardId":"RCS - 067 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Quivera","image":"","power":"3","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+6) jika kartu ini TIDAK ter-protect.","classId":"P1 - Barbarian","characterId":"Animatherea - Quivera","cardId":"RCS - 068 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Fallencia Ostra","image":"","power":"3","role":"Tank | Support","keyword":"PROTECT","skill":"PROTECT kartu yang Raw Power-nya terkecil di seluruh Arena!","classId":"P1 - Steward","characterId":"Animatherea - Fallencia O.","cardId":"RCS - 069 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Thinis Necro","image":"","power":"0","role":"Ranged | Magic","keyword":"POWERUP, SILENCE","skill":"POWERUP (+10). | SILENCE kartu ini!","classId":"P1 - Spellshot","characterId":"Animatherea - Thinis E.","cardId":"RCS - 070 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Tilla","image":"","power":"2","role":"","keyword":"POWERUP","skill":"POWERUP (+6).","classId":"P1 - Adventurer","characterId":"Animatherea - Tilla","cardId":"RCS - 071 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Temple of Thales","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Protect lain di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Ward Keeper","characterId":"Animatherea - Millice S.","cardId":"RCS - 072 | Standard","category":"Convergence"}
+    ];
+
+    let allCards = [];
+    let userDeck = [];
+    let communityDecks = [];
+    let campSchedules = [];
+    let campDirectories = [];
+    let leaderboardData = [];
+    let isAdminLoggedIn = false;
+
+    function initCardsData() {
+      const saved = localStorage.getItem('renathea_cards_db');
+      if (saved) {
+        try { allCards = JSON.parse(saved); } catch (e) { allCards = [...defaultCards]; }
+      } else {
+        allCards = [...defaultCards];
+        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
+      }
+    }
+
+    function initCommunityDecks() {
+      const saved = localStorage.getItem('renathea_community_decks');
+      if (saved) {
+        try { communityDecks = JSON.parse(saved); } catch (e) { communityDecks = []; }
+      }
+    }
+
+    function initCampSchedules() {
+      const saved = localStorage.getItem('renathea_camp_schedules');
+      if (saved) {
+        try { campSchedules = JSON.parse(saved); } catch (e) { campSchedules = []; }
+      }
+    }
+
+    function initCampDirectories() {
+      const saved = localStorage.getItem('renathea_camp_dirs');
+      if (saved) {
+        try { campDirectories = JSON.parse(saved); } catch (e) { campDirectories = []; }
+      }
+    }
+
+    function initLeaderboard() {
+      const saved = localStorage.getItem('renathea_leaderboard');
+      if (saved) {
+        try { leaderboardData = JSON.parse(saved); } catch (e) { leaderboardData = []; }
+      }
+    }
+
+    function formatSkillText(skillText) {
+      if (!skillText || skillText === "-") return "";
+      const lines = skillText.split('|').map(line => line.trim()).filter(line => line.length > 0);
+      return lines.map(line => `<div class="skill-line">${line}</div>`).join('');
+    }
+
+    function switchMainTab(tabId) {
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      const tabs = ['search-tab', 'deck-tab', 'community-tab', 'camp-tab', 'leaderboard-tab', 'admin-tab'];
+      const btnIndex = tabs.indexOf(tabId);
+      if (btnIndex >= 0) document.querySelectorAll('.nav-tab-btn')[btnIndex].classList.add('active');
+
+      if (tabId === 'search-tab') renderCards(allCards);
+      else if (tabId === 'deck-tab') { renderDeckUI(); renderDeckAvailableGrid(allCards); }
+      else if (tabId === 'community-tab') renderCommunityDecks();
+      else if (tabId === 'camp-tab') { renderCampDirectories(); renderCampSchedules(); }
+      else if (tabId === 'leaderboard-tab') renderLeaderboardTable();
+      else if (tabId === 'admin-tab') checkAdminAuthStatus();
+
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleChip(button, context = 'search') {
+      button.classList.toggle('active');
+      applyFilters(context);
+    }
+
+    /* RENDER UNTUK TAB DATABASE KARTU (TANPA TOMBOL TAMBAH DECK) */
+    function renderCards(cards) {
+      const grid = document.getElementById('card-grid');
+      const countLabel = document.getElementById('results-count');
+      grid.innerHTML = "";
+      countLabel.textContent = `Menampilkan ${cards.length} kartu`;
+
+      if (cards.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">Tidak ada kartu yang cocok.</div>`;
+        return;
+      }
+
+      cards.forEach((card) => {
+        const bgStyle = card.image ? `background-image: url('${card.image}')` : "";
+        const placeholder = !card.image ? `<div class="card-image-placeholder">${card.name}</div>` : "";
+        const formattedSkill = formatSkillText(card.skill);
+
+        const cardEl = document.createElement('div');
+        cardEl.className = 'tcg-card';
+        cardEl.innerHTML = `
+          <div class="card-image" style="${bgStyle}" onclick="showModalByCardId('${card.cardId}')">
+            <div class="card-category-tag">${card.category || 'Convergence'}</div>
+            ${placeholder}
+            <div class="card-badge">PWR: ${card.power}</div>
+          </div>
+          <div class="card-body" onclick="showModalByCardId('${card.cardId}')">
+            <div class="card-title">${card.name}</div>
+            <div class="card-id">${card.cardId}</div>
+            <div class="card-meta">
+              <div><span>Role:</span> ${card.role || '-'}</div>
+              <div><span>Class:</span> ${card.classId || '-'}</div>
+            </div>
+            ${formattedSkill ? `<div class="card-skill-box">${formattedSkill}</div>` : ''}
+          </div>
+        `;
+        grid.appendChild(cardEl);
+      });
+    }
+
+    /* RENDER UNTUK TAB DECK BUILDER (DENGAN TOMBOL TAMBAH DECK) */
+    function renderDeckAvailableGrid(cards) {
+      const grid = document.getElementById('deck-available-grid');
+      const countLabel = document.getElementById('deck-results-count');
+      grid.innerHTML = "";
+      countLabel.textContent = `Menampilkan ${cards.length} kartu`;
+
+      if (cards.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">Tidak ada kartu yang cocok.</div>`;
+        return;
+      }
+
+      cards.forEach((card) => {
+        const bgStyle = card.image ? `background-image: url('${card.image}')` : "";
+        const placeholder = !card.image ? `<div class="card-image-placeholder">${card.name}</div>` : "";
+        const formattedSkill = formatSkillText(card.skill);
+
+        const cardEl = document.createElement('div');
+        cardEl.className = 'tcg-card';
+        cardEl.innerHTML = `
+          <div class="card-image" style="${bgStyle}" onclick="showModalByCardId('${card.cardId}')">
+            <div class="card-category-tag">${card.category || 'Convergence'}</div>
+            ${placeholder}
+            <div class="card-badge">PWR: ${card.power}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-title" onclick="showModalByCardId('${card.cardId}')">${card.name}</div>
+            <div class="card-id">${card.cardId}</div>
+            <div class="card-meta" onclick="showModalByCardId('${card.cardId}')">
+              <div><span>Role:</span> ${card.role || '-'}</div>
+              <div><span>Class:</span> ${card.classId || '-'}</div>
+            </div>
+            ${formattedSkill ? `<div class="card-skill-box" onclick="showModalByCardId('${card.cardId}')">${formattedSkill}</div>` : ''}
+            <button class="btn-add-deck" onclick="addCardToDeck('${card.cardId}')">+ Tambah ke Deck</button>
+          </div>
+        `;
+        grid.appendChild(cardEl);
+      });
+    }
+
+    function applyFilters(context = 'search') {
+      const prefix = context === 'deck' ? 'deck-' : '';
+      const query = document.getElementById(`${prefix}search-input`).value.toLowerCase().trim();
+      const selectedCat = document.getElementById(`${prefix}category-select`).value;
+      const selectedSet = document.getElementById(`${prefix}set-select`).value;
+
+      const activeRoles = Array.from(document.querySelectorAll(`#${prefix}role-chips .chip-btn.active`)).map(b => b.getAttribute('data-value').toLowerCase());
+      const activeKeywords = Array.from(document.querySelectorAll(`#${prefix}keyword-chips .chip-btn.active`)).map(b => b.getAttribute('data-value').toLowerCase());
+
+      const filtered = allCards.filter(card => {
+        const matchesQuery = !query || card.name.toLowerCase().includes(query) || card.skill.toLowerCase().includes(query) || card.keyword.toLowerCase().includes(query) || card.classId.toLowerCase().includes(query) || card.cardId.toLowerCase().includes(query);
+        const matchesCat = !selectedCat || card.category === selectedCat;
+        const matchesSet = !selectedSet || card.set === selectedSet;
+        const cardRoleLower = (card.role || "").toLowerCase();
+        const matchesRole = activeRoles.length === 0 || activeRoles.every(r => cardRoleLower.includes(r));
+        const cardKeywordLower = (card.keyword || "").toLowerCase();
+        const matchesKeyword = activeKeywords.length === 0 || activeKeywords.every(kw => cardKeywordLower.includes(kw));
+
+        return matchesQuery && matchesCat && matchesSet && matchesRole && matchesKeyword;
+      });
+
+      if (context === 'deck') renderDeckAvailableGrid(filtered);
+      else renderCards(filtered);
+    }
+
+    function resetFilters(context = 'search') {
+      const prefix = context === 'deck' ? 'deck-' : '';
+      document.getElementById(`${prefix}search-input`).value = "";
+      document.getElementById(`${prefix}category-select`).value = "";
+      document.getElementById(`${prefix}set-select`).value = "";
+      document.querySelectorAll(`#${prefix}role-chips .chip-btn.active, #${prefix}keyword-chips .chip-btn.active`).forEach(b => b.classList.remove('active'));
+      applyFilters(context);
+    }
+
+    function addCardToDeck(cardId) {
+      const card = allCards.find(c => c.cardId === cardId);
+      if (!card) return;
+      if (userDeck.length >= 9) { alert("⚠️ Deck penuh! Maksimal 9 kartu."); return; }
+      if (userDeck.some(c => c.cardId === card.cardId)) { alert(`⚠️ Kartu '${card.name}' sudah ada di deck!`); return; }
+      if (card.classId && card.classId !== "-" && userDeck.some(c => c.classId === card.classId)) { alert(`⚠️ Class ID '${card.classId}' sudah dipakai!`); return; }
+
+      userDeck.push(card);
+      renderDeckUI();
+    }
+
+    function removeCardFromDeck(index) {
+      userDeck.splice(index, 1);
+      renderDeckUI();
+    }
+
+    function clearCurrentDeck() {
+      if (confirm("Kosongkan deck?")) { userDeck = []; renderDeckUI(); }
+    }
+
+    function renderDeckUI() {
+      const listContainer = document.getElementById('deck-card-list');
+      const countEl = document.getElementById('deck-card-count');
+      const powerEl = document.getElementById('deck-total-power');
+
+      countEl.textContent = `${userDeck.length}/9`;
+      let totalPower = userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0);
+      powerEl.textContent = totalPower;
+
+      if (userDeck.length === 0) {
+        listContainer.innerHTML = `<div style="text-align: center; color: #888; font-size:0.85rem; padding: 20px 0;">Deck masih kosong.</div>`;
+        return;
+      }
+
+      listContainer.innerHTML = "";
+      userDeck.forEach((card, idx) => {
+        const item = document.createElement('div');
+        item.className = 'deck-card-item';
+        item.innerHTML = `
+          <div class="deck-card-info">
+            <span class="deck-card-name">${idx + 1}. ${card.name}</span>
+            <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
+          </div>
+          <button class="btn-remove-card" onclick="removeCardFromDeck(${idx})">&times;</button>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function publishDeckToCommunity() {
+      const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
+      const deckNote = document.getElementById('deck-note-input').value.trim();
+
+      if (userDeck.length === 0) { alert("⚠️ Deck masih kosong!"); return; }
+
+      const newCommunityDeck = {
+        id: 'deck_' + Date.now(),
+        name: deckName,
+        note: deckNote,
+        cards: userDeck.map(c => c.cardId),
+        totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
+        author: "Pemain Komunitas",
+        updatedAt: new Date().toLocaleDateString('id-ID')
+      };
+
+      communityDecks.unshift(newCommunityDeck);
+      localStorage.setItem('renathea_community_decks', JSON.stringify(communityDecks));
+      alert(`🌐 Berhasil dipublikasikan ke tab Deck Komunitas!`);
+      switchMainTab('community-tab');
+    }
+
+    function renderCommunityDecks() {
+      const grid = document.getElementById('community-deck-grid');
+      grid.innerHTML = "";
+
+      if (communityDecks.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck komunitas.</div>`;
+        return;
+      }
+
+      communityDecks.forEach((deck) => {
+        let cardRowsHtml = "";
+        deck.cards.forEach((cardId, i) => {
+          const cardObj = allCards.find(c => c.cardId === cardId);
+          cardRowsHtml += `
+            <div class="community-card-row">
+              <span>${i + 1}. ${cardObj ? cardObj.name : cardId}</span>
+              <span style="font-weight:600; color:#555;">PWR: ${cardObj ? cardObj.power : '0'}</span>
+            </div>
+          `;
+        });
+
+        const deckEl = document.createElement('div');
+        deckEl.className = 'community-deck-card';
+        deckEl.innerHTML = `
+          <div class="community-deck-title">${deck.name}</div>
+          <div class="community-deck-meta">Oleh: ${deck.author} | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
+          <div class="community-deck-note">"${deck.note || '-'}"</div>
+          <div class="community-card-preview-list">${cardRowsHtml}</div>
+          <div style="display: flex; gap: 8px; margin-top: auto;">
+            <button class="btn btn-primary" style="flex:1; font-size:0.85rem;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
+            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.85rem;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
+          </div>
+        `;
+        grid.appendChild(deckEl);
+      });
+    }
+
+    function loadDeckToBuilder(deckId) {
+      const target = communityDecks.find(d => d.id === deckId);
+      if (!target) return;
+      document.getElementById('deck-name-input').value = target.name;
+      document.getElementById('deck-note-input').value = target.note;
+      userDeck = target.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
+      switchMainTab('deck-tab');
+      alert(`✅ Deck dimuat ke Deck Builder!`);
+    }
+
+    function deleteCommunityDeck(deckId) {
+      if (confirm("Hapus deck ini sebagai admin?")) {
+        communityDecks = communityDecks.filter(d => d.id !== deckId);
+        localStorage.setItem('renathea_community_decks', JSON.stringify(communityDecks));
+        renderCommunityDecks();
+      }
+    }
+
+    /* CAMP DIRECTORY & SCHEDULE LOGIC */
+    function submitCampDirectory() {
+      const name = document.getElementById('dir-name-input').value.trim();
+      const captain = document.getElementById('dir-captain-input').value.trim();
+      const location = document.getElementById('dir-location-input').value.trim();
+      const schedule = document.getElementById('dir-schedule-input').value.trim();
+      const link = document.getElementById('dir-link-input').value.trim();
+
+      if (!name || !captain) {
+        alert("⚠️ Nama Camp dan Camp Captain wajib diisi!");
+        return;
+      }
+
+      const newDir = { id: 'dir_' + Date.now(), name, captain, location, schedule, link };
+      campDirectories.unshift(newDir);
+      localStorage.setItem('renathea_camp_dirs', JSON.stringify(campDirectories));
+      alert("✅ Renathea Camp berhasil ditambahkan ke direktori!");
+
+      document.getElementById('dir-name-input').value = "";
+      document.getElementById('dir-captain-input').value = "";
+      document.getElementById('dir-location-input').value = "";
+      document.getElementById('dir-schedule-input').value = "";
+      document.getElementById('dir-link-input').value = "";
+      renderCampDirectories();
+    }
+
+    function renderCampDirectories() {
+      const grid = document.getElementById('camp-directory-grid');
+      grid.innerHTML = "";
+
+      if (campDirectories.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 20px;">Belum ada data Camp terdaftar.</div>`;
+        return;
+      }
+
+      campDirectories.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'camp-directory-card';
+        card.innerHTML = `
+          <div class="camp-directory-title">🏕️ ${item.name}</div>
+          <div class="camp-directory-meta">👑 <strong>Captain:</strong> ${item.captain}</div>
+          <div class="camp-directory-meta">📍 <strong>Lokasi:</strong> ${item.location || '-'}</div>
+          <div class="camp-directory-meta" style="margin-bottom: 12px;">🕒 <strong>Jadwal:</strong> ${item.schedule || '-'}</div>
+          ${item.link ? `<a href="${item.link}" target="_blank" class="camp-link-btn">🔗 Gabung Komunitas Camp</a>` : ''}
+          ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size: 0.75rem; padding: 4px; margin-top: 8px;" onclick="deleteCampDirectory('${item.id}')">Hapus Camp</button>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function deleteCampDirectory(id) {
+      if (confirm("Hapus Camp ini dari direktori?")) {
+        campDirectories = campDirectories.filter(d => d.id !== id);
+        localStorage.setItem('renathea_camp_dirs', JSON.stringify(campDirectories));
+        renderCampDirectories();
+      }
+    }
+
+    function submitCampSchedule() {
+      const type = document.getElementById('camp-type-input').value;
+      const title = document.getElementById('camp-title-input').value.trim();
+      const time = document.getElementById('camp-time-input').value.trim();
+      const desc = document.getElementById('camp-desc-input').value.trim();
+
+      if (!title || !time) {
+        alert("⚠️ Nama Camp dan Waktu Pelaksanaan wajib diisi!");
+        return;
+      }
+
+      const newSchedule = { id: 'camp_' + Date.now(), type, title, time, desc };
+      campSchedules.unshift(newSchedule);
+      localStorage.setItem('renathea_camp_schedules', JSON.stringify(campSchedules));
+      alert("📢 Jadwal Renathea Camp berhasil dipublikasikan!");
+      document.getElementById('camp-title-input').value = "";
+      document.getElementById('camp-time-input').value = "";
+      document.getElementById('camp-desc-input').value = "";
+      renderCampSchedules();
+    }
+
+    function renderCampSchedules() {
+      const listBox = document.getElementById('schedule-list-box');
+      listBox.innerHTML = "";
+
+      if (campSchedules.length === 0) {
+        listBox.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan admin.</div>`;
+        return;
+      }
+
+      campSchedules.forEach((item) => {
+        const badgeColor = item.type === 'OnCamp' ? '#e60012' : item.type === 'Campless' ? '#2b2b2b' : item.type === 'TarCamp' ? '#0066cc' : item.type === 'Turnamen Nasional' ? '#d4af37' : '#800080';
+        const row = document.createElement('div');
+        row.className = 'schedule-item';
+        row.innerHTML = `
+          <div>
+            <span style="background: ${badgeColor}; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">${item.type}</span>
+            <h4 style="margin-top: 6px; font-size: 1.05rem; color: #111;">${item.title}</h4>
+            <p style="font-size: 0.85rem; color: #555; margin-top: 2px;">🕒 ${item.time}</p>
+            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 6px; border-radius: 4px;">${item.desc}</p>` : ''}
+          </div>
+          ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size: 0.8rem; padding: 4px 10px;" onclick="deleteCampSchedule('${item.id}')">Hapus</button>` : ''}
+        `;
+        listBox.appendChild(row);
+      });
+    }
+
+    function deleteCampSchedule(id) {
+      if (confirm("Hapus jadwal ini?")) {
+        campSchedules = campSchedules.filter(s => s.id !== id);
+        localStorage.setItem('renathea_camp_schedules', JSON.stringify(campSchedules));
+        renderCampSchedules();
+      }
+    }
+
+    /* LEADERBOARD / POWERBOARD LOGIC */
+    function submitLeaderboardEntry() {
+      const name = document.getElementById('lb-name-input').value.trim();
+      const camp = document.getElementById('lb-camp-input').value.trim();
+      const power = parseInt(document.getElementById('lb-power-input').value) || 0;
+
+      if (!name) {
+        alert("⚠️ Nama pemain wajib diisi!");
+        return;
+      }
+
+      // Hapus jika nama pemain sudah ada agar terupdate
+      leaderboardData = leaderboardData.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+
+      // Tambahkan data pemain baru
+      leaderboardData.push({ name, camp, power });
+
+      // Urutkan berdasarkan total power terbesar ke terkecil
+      leaderboardData.sort((a, b) => b.power - a.power);
+
+      // Kalkulasi ulang rank otomatis
+      leaderboardData.forEach((player, index) => {
+        player.rank = index + 1;
+      });
+
+      localStorage.setItem('renathea_leaderboard', JSON.stringify(leaderboardData));
+      alert("🏆 Peringkat leaderboard berhasil diperbarui dan diurutkan otomatis!");
+      
+      document.getElementById('lb-name-input').value = "";
+      document.getElementById('lb-camp-input').value = "";
+      document.getElementById('lb-power-input').value = "0";
+      
+      renderLeaderboardTable();
+    }
+
+    function renderLeaderboardTable() {
+      const tbody = document.getElementById('leaderboard-table-body');
+      tbody.innerHTML = "";
+
+      if (leaderboardData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan oleh admin.</td></tr>`;
+        return;
+      }
+
+      leaderboardData.forEach((player, idx) => {
+        const tr = document.createElement('tr');
+        const badge = player.rank === 1 ? '🥇 1' : player.rank === 2 ? '🥈 2' : player.rank === 3 ? '🥉 3' : `#${player.rank}`;
+        tr.innerHTML = `
+          <td style="font-weight: bold; font-size: 1.05rem;">${badge}</td>
+          <td style="font-weight: 700; color: #111;">${player.name}</td>
+          <td>${player.camp || '-'}</td>
+          <td style="font-weight: 600; color: var(--primary);">${player.power} Power</td>
+          <td>${isAdminLoggedIn ? `<button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteLeaderboardEntry(${idx})">Hapus</button>` : '<span style="color:#666; font-size:0.8rem;">Terverifikasi</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteLeaderboardEntry(index) {
+      if (confirm("Hapus pemain ini dari leaderboard?")) {
+        leaderboardData.splice(index, 1);
+        
+        // Kalkulasi ulang rank setelah penghapusan
+        leaderboardData.forEach((player, i) => {
+          player.rank = i + 1;
+        });
+        
+        localStorage.setItem('renathea_leaderboard', JSON.stringify(leaderboardData));
+        renderLeaderboardTable();
+      }
+    }
+
+    /* ADMIN AUTH & DASHBOARD LOGIC */
+    function checkAdminAuthStatus() {
+      const loginBox = document.getElementById('admin-login-box');
+      const dashBox = document.getElementById('admin-dashboard-box');
+
+      if (isAdminLoggedIn) {
+        loginBox.style.display = 'none';
+        dashBox.style.display = 'block';
+        renderAdminTable();
+        renderCampDirectories();
+        renderLeaderboardTable();
+      } else {
+        loginBox.style.display = 'block';
+        dashBox.style.display = 'none';
+      }
+    }
+
+    function handleAdminLogin() {
+      const pass = document.getElementById('admin-pass-input').value;
+      if (pass === "Azezax10") {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-pass-input').value = "";
+        checkAdminAuthStatus();
+        alert("✅ Login admin berhasil!");
+      } else {
+        alert("❌ Password salah!");
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdminLoggedIn = false;
+      checkAdminAuthStatus();
+      alert("🔒 Berhasil logout dari admin.");
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-table-body');
+      document.getElementById('admin-total-count').textContent = allCards.length;
+      tbody.innerHTML = "";
+
+      allCards.forEach((card, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${card.cardId || '-'}</td>
+          <td style="font-weight:600;">${card.name}</td>
+          <td>${card.set || '-'}</td>
+          <td>${card.power}</td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 2px 8px; font-size:0.75rem;" onclick="editCard(${index})">Edit</button>
+            <button class="btn btn-danger" style="padding: 2px 8px; font-size:0.75rem;" onclick="deleteCard(${index})">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function saveAdminCard() {
+      const editIndex = parseInt(document.getElementById('admin-edit-index').value);
+      const name = document.getElementById('admin-name').value.trim();
+      const cardId = document.getElementById('admin-cardId').value.trim();
+
+      if (!name || !cardId) { alert("⚠️ Nama dan Card ID wajib diisi!"); return; }
+
+      const cardData = {
+        name, cardId,
+        category: document.getElementById('admin-category').value,
+        set: document.getElementById('admin-set').value.trim() || "-",
+        power: document.getElementById('admin-power').value || "0",
+        classId: document.getElementById('admin-classId').value.trim() || "-",
+        role: document.getElementById('admin-role').value.trim() || "-",
+        keyword: document.getElementById('admin-keyword').value.trim() || "",
+        image: document.getElementById('admin-image').value.trim() || "",
+        skill: document.getElementById('admin-skill').value.trim() || "",
+        series: "Custom", illustrator: "-"
+      };
+
+      if (editIndex >= 0) { allCards[editIndex] = cardData; alert("✅ Kartu diperbarui!"); }
+      else { allCards.push(cardData); alert("✅ Kartu ditambahkan!"); }
+
+      localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
+      resetAdminForm();
+      renderAdminTable();
+    }
+
+    function editCard(index) {
+      const c = allCards[index];
+      document.getElementById('admin-edit-index').value = index;
+      document.getElementById('admin-form-title').textContent = "Edit: " + c.name;
+      document.getElementById('admin-name').value = c.name;
+      document.getElementById('admin-cardId').value = c.cardId;
+      document.getElementById('admin-category').value = c.category || "Convergence";
+      document.getElementById('admin-set').value = c.set;
+      document.getElementById('admin-power').value = c.power;
+      document.getElementById('admin-classId').value = c.classId;
+      document.getElementById('admin-role').value = c.role;
+      document.getElementById('admin-keyword').value = c.keyword;
+      document.getElementById('admin-image').value = c.image;
+      document.getElementById('admin-skill').value = c.skill;
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function deleteCard(index) {
+      if (confirm("Hapus kartu ini?")) {
+        allCards.splice(index, 1);
+        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
+        renderAdminTable();
+      }
+    }
+
+    function resetAdminForm() {
+      document.getElementById('admin-edit-index').value = "-1";
+      document.getElementById('admin-form-title').textContent = "Tambah Kartu Baru";
+      ['admin-name','admin-cardId','admin-set','admin-classId','admin-role','admin-keyword','admin-image','admin-skill'].forEach(id => document.getElementById(id).value = "");
+      document.getElementById('admin-power').value = "0";
+    }
+
+    function resetToDefaultData() {
+      if (confirm("Reset database ke awal?")) {
+        allCards = [...defaultCards];
+        localStorage.setItem('renathea_cards_db', JSON.stringify(allCards));
+        renderAdminTable();
+        alert("✅ Database direset.");
+      }
+    }
+
+    function showModalByCardId(cardId) {
+      const card = allCards.find(c => c.cardId === cardId);
+      if (card) showModal(card);
+    }
+
+    function showModal(card) {
+      document.getElementById('modal-title').textContent = card.name;
+      document.getElementById('modal-id').textContent = card.cardId;
+      const formattedSkill = formatSkillText(card.skill);
+
+      const detailsContainer = document.getElementById('modal-details');
+      detailsContainer.innerHTML = `
+        <div><label>Kategori</label><p>${card.category || '-'}</p></div>
+        <div><label>Series</label><p>${card.series || '-'}</p></div>
+        <div><label>Nama Set</label><p>${card.set}</p></div>
+        <div><label>Raw Power</label><p>${card.power}</p></div>
+        <div><label>Role</label><p>${card.role || '-'}</p></div>
+        <div><label>Class ID</label><p>${card.classId || '-'}</p></div>
+        <div><label>Keyword</label><p>${card.keyword || '-'}</p></div>
+        <div><label>Ilustrator</label><p>${card.illustrator || '-'}</p></div>
+        <div style="grid-column: 1 / -1;"><label>Skill Deskripsi</label><div class="card-skill-box" style="margin-top:6px;">${formattedSkill || '-'}</div></div>
+      `;
+
+      document.getElementById('card-modal').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('card-modal').classList.remove('active'); }
+
+    // Init
+    initCardsData();
+    initCommunityDecks();
+    initCampSchedules();
+    initCampDirectories();
+    initLeaderboard();
+    renderCards(allCards);
+  </script>
+</body>
+</html>
