@@ -578,6 +578,32 @@
       border-radius: 4px;
     }
 
+    .prob-badge {
+      display: inline-block;
+      background: #e6f7ff;
+      color: #0050b3;
+      border: 1px solid #91d5ff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .sim-card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .sim-card-item {
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.82rem;
+    }
+
     .camp-info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -775,8 +801,8 @@
     .modal-content {
       background: #fff;
       border-radius: var(--radius);
-      max-width: 600px;
-      width: 90%;
+      max-width: 680px;
+      width: 92%;
       max-height: 90vh;
       overflow-y: auto;
       padding: 24px;
@@ -1102,7 +1128,7 @@
       </div>
     </div>
 
-    <!-- TAB 6: ADMIN DASHBOARD (TERLETAK DI LUAR TAB UTAMA) -->
+    <!-- TAB 6: ADMIN DASHBOARD -->
     <div id="admin-tab" class="tab-content">
       
       <div id="admin-login-box" class="admin-auth-box">
@@ -1300,6 +1326,7 @@
     </div>
   </div>
 
+  <!-- MODAL DETAIL KARTU -->
   <div class="modal-overlay" id="card-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -1311,11 +1338,52 @@
     </div>
   </div>
 
+  <!-- MODAL UJI DECK & ANALISIS PROBABILITAS -->
+  <div class="modal-overlay" id="deck-test-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeTestModal()">&times;</button>
+      <div class="modal-header">
+        <h2 id="test-modal-title">🧪 Uji Deck & Analisis Probabilitas</h2>
+        <span id="test-modal-sub" style="font-size: 0.85rem; color: #666;">Draw Simulasi 6 Kartu Awal (Hipergeometrik)</span>
+      </div>
+
+      <!-- BAGIAN SIMULATOR HAND -->
+      <div style="background:#f8f9fa; border:1px solid var(--border-color); padding:16px; border-radius:6px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:1.05rem;">🃏 Hand Draw Awal (6 Kartu)</h3>
+          <button class="btn btn-primary" style="padding:6px 14px; font-size:0.82rem;" onclick="reshuffleTestHand()">🎲 Ulangi Kocok Hand</button>
+        </div>
+        <div id="sim-hand-container" class="sim-card-list"></div>
+        <div style="font-size:0.85rem; font-weight:600; color:#444;" id="sim-hand-stats"></div>
+      </div>
+
+      <!-- BAGIAN ANALISIS PROBABILITAS METEMATIS -->
+      <div>
+        <h3 style="font-size:1.05rem; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:4px;">📊 Analisis Konsistensi & Peluang Draw (6 dari 9 Kartu)</h3>
+        
+        <div style="margin-bottom:16px;">
+          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">1. Statis Dasar Matriks Hand Awal</h4>
+          <ul style="font-size:0.85rem; color:#333; padding-left:20px; line-height:1.6;">
+            <li>Peluang **1 Kartu Spesifik** (Key Card) ditarik ke Hand Awal: <span class="prob-badge">66.67%</span></li>
+            <li>Peluang **2 Kartu Combo Spesifik** (Key A + Key B) keduanya ditarik ke Hand Awal: <span class="prob-badge">41.67%</span></li>
+            <li>Ekspektasi Total Raw Power di Hand Awal: <strong id="stat-expected-power">0</strong> (Min: <span id="stat-min-power">0</span>, Max: <span id="stat-max-power">0</span>)</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">2. Peluang Ditarik Berdasarkan Role Kartu (Min 1 Kartu)</h4>
+          <div id="stat-role-breakdown" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+
+        <div>
+          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">3. Peluang Ditarik Berdasarkan Keyword / Skill (Min 1 Kartu)</h4>
+          <div id="stat-keyword-breakdown" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // =========================================================================
-    // ⚠️ KONFIGURASI FIREBASE CLOUD FIRESTORE
-    // Gantikan nilai di bawah ini dengan firebaseConfig dari Firebase Console Anda
-    // =========================================================================
     const firebaseConfig = {
       apiKey: "PASTE_API_KEY_ANDA_DI_SINI",
       authDomain: "renathea-cardvault.firebaseapp.com",
@@ -1419,6 +1487,7 @@
     let campDirectories = [];
     let leaderboardData = [];
     let isAdminLoggedIn = false;
+    let currentTestDeckObj = null;
 
     // REAL-TIME CLOUD LISTENERS
     function listenToCommunityDecks() {
@@ -1574,7 +1643,6 @@
       });
     }
 
-    // PENYARINGAN FILTER (DENGAN DUKUNGAN "NO ROLE" & "NO SKILL")
     function applyFilters(context = 'search') {
       const prefix = context === 'deck' ? 'deck-' : '';
       const query = document.getElementById(`${prefix}search-input`).value.toLowerCase().trim();
@@ -1595,7 +1663,6 @@
         const matchesCat = !selectedCat || card.category === selectedCat;
         const matchesSet = !selectedSet || card.set === selectedSet;
 
-        // Evaluasi Filter Role
         const cardRoleRaw = (card.role || "").trim();
         const cardRoleLower = cardRoleRaw.toLowerCase();
         const isNoRole = !cardRoleRaw || cardRoleRaw === "-";
@@ -1608,7 +1675,6 @@
           });
         }
 
-        // Evaluasi Filter Keyword / Skill
         const cardKeywordRaw = (card.keyword || "").trim();
         const cardSkillRaw = (card.skill || "").trim();
         const cardKeywordLower = cardKeywordRaw.toLowerCase();
@@ -1697,7 +1763,6 @@
       });
     }
 
-    // PUBLIKASI DECK KE COMMUNITY (DENGAN NICKNAME OPSIONAL & AUTO RESET FORM)
     function publishDeckToCommunity() {
       const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
       const deckNote = document.getElementById('deck-note-input').value.trim();
@@ -1720,7 +1785,7 @@
       db.collection("community_decks").add(newDeck)
         .then(() => {
           alert("🌐 Berhasil dipublikasikan ke server cloud!");
-          clearDeckForm(); // Otomatis reset form & list deck setelah berhasil dipublikasikan
+          clearDeckForm();
           switchMainTab('community-tab');
         })
         .catch((err) => {
@@ -1757,13 +1822,144 @@
           <div class="community-deck-meta">Oleh: <strong>${deck.author}</strong> | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
           <div class="community-deck-note">"${deck.note || '-'}"</div>
           <div class="community-card-preview-list">${cardRowsHtml}</div>
-          <div style="display: flex; gap: 8px; margin-top: auto;">
-            <button class="btn btn-primary" style="flex:1; font-size:0.85rem;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
-            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.85rem;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
+          <div style="display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:6px 8px;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
+            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji Deck & Analisis</button>
+            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.8rem; padding:6px 8px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
           </div>
         `;
         grid.appendChild(deckEl);
       });
+    }
+
+    // FUNGSI UJI DECK & ANALISIS PROBABILITAS
+    function openTestDeckModal(deckId) {
+      const deck = communityDecks.find(d => d.id === deckId);
+      if (!deck) return;
+
+      currentTestDeckObj = deck;
+      document.getElementById('test-modal-title').textContent = `🧪 Uji Deck: ${deck.name}`;
+      document.getElementById('test-modal-sub').textContent = `Oleh: ${deck.author} | Total Power Deck: ${deck.totalPower}`;
+
+      // Hitung Analisis Statis Matematika
+      calculateDeckProbabilities(deck);
+
+      // Jalankan Simulasi Draw Hand Pertama
+      reshuffleTestHand();
+
+      document.getElementById('deck-test-modal').classList.add('active');
+    }
+
+    function closeTestModal() {
+      document.getElementById('deck-test-modal').classList.remove('active');
+    }
+
+    function reshuffleTestHand() {
+      if (!currentTestDeckObj) return;
+
+      const deckCards = currentTestDeckObj.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
+      
+      // Shuffle Fisher-Yates
+      const shuffled = [...deckCards];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      const hand6 = shuffled.slice(0, 6);
+      const remaining3 = shuffled.slice(6, 9);
+
+      const simContainer = document.getElementById('sim-hand-container');
+      simContainer.innerHTML = "";
+
+      let handPower = 0;
+      hand6.forEach((c, idx) => {
+        handPower += (parseInt(c.power) || 0);
+        const cardBox = document.createElement('div');
+        cardBox.className = 'sim-card-item';
+        cardBox.innerHTML = `
+          <div style="font-weight:bold; color:#111;">${idx + 1}. ${c.name}</div>
+          <div style="font-size:0.75rem; color:#666;">${c.role || 'No Role'} | PWR: ${c.power}</div>
+        `;
+        simContainer.appendChild(cardBox);
+      });
+
+      document.getElementById('sim-hand-stats').innerHTML = `
+        Total Raw Power Hand Awal: <span style="color:var(--primary); font-size:1rem;">${handPower}</span> | 
+        Kartu Tertahan di Deck (3 Kartu): <strong>${remaining3.map(c => c.name).join(', ')}</strong>
+      `;
+    }
+
+    // HITUNG KALKULASI PELUANG HIPERGEOMETRIK
+    function calculateDeckProbabilities(deck) {
+      const fullCards = deck.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
+
+      // 1. Statis Power
+      const expectedPower = ( (6 / 9) * deck.totalPower ).toFixed(1);
+      const powers = fullCards.map(c => parseInt(c.power) || 0).sort((a,b) => a - b);
+      
+      // Min 6 power & Max 6 power
+      const minPower = powers.slice(0, 6).reduce((a, b) => a + b, 0);
+      const maxPower = powers.slice(3, 9).reduce((a, b) => a + b, 0);
+
+      document.getElementById('stat-expected-power').textContent = expectedPower;
+      document.getElementById('stat-min-power').textContent = minPower;
+      document.getElementById('stat-max-power').textContent = maxPower;
+
+      // 2. Peluang Kombinasi Role (Peluang minimal ditarik 1 kartu role tersebut di 6 draw awal)
+      const rolesList = ['Tank', 'Melee', 'Agility', 'Ranged', 'Magic', 'Support', 'No Role'];
+      const roleBreakdownEl = document.getElementById('stat-role-breakdown');
+      roleBreakdownEl.innerHTML = "";
+
+      rolesList.forEach(role => {
+        let count = 0;
+        if (role === 'No Role') {
+          count = fullCards.filter(c => !c.role || c.role === '-' || c.role.trim() === '').length;
+        } else {
+          count = fullCards.filter(c => c.role && c.role.toLowerCase().includes(role.toLowerCase())).length;
+        }
+
+        if (count > 0) {
+          const prob = getHypergeometricProbAtLeastOne(count);
+          roleBreakdownEl.innerHTML += `
+            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+              <strong>${role}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
+            </div>
+          `;
+        }
+      });
+
+      // 3. Peluang Kombinasi Keyword / Skill
+      const keywordsList = ['Powerup', 'Silence', 'Protect', 'Law', 'Copy', 'Passive', 'No Skill'];
+      const kwBreakdownEl = document.getElementById('stat-keyword-breakdown');
+      kwBreakdownEl.innerHTML = "";
+
+      keywordsList.forEach(kw => {
+        let count = 0;
+        if (kw === 'No Skill') {
+          count = fullCards.filter(c => (!c.skill || c.skill === '-') && (!c.keyword || c.keyword === '-')).length;
+        } else {
+          count = fullCards.filter(c => c.keyword && c.keyword.toLowerCase().includes(kw.toLowerCase())).length;
+        }
+
+        if (count > 0) {
+          const prob = getHypergeometricProbAtLeastOne(count);
+          kwBreakdownEl.innerHTML += `
+            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+              <strong>${kw}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
+            </div>
+          `;
+        }
+      });
+    }
+
+    // Matematika hipergeometrik: Peluang ditarik MINIMAL 1 dari K kartu sukses dalam 9 kartu ketika mengambil 6 kartu
+    function getHypergeometricProbAtLeastOne(K) {
+      if (K >= 4) return "100.0"; // Jika dalam 9 kartu ada 4+ kartu target, dan kita ambil 6, pasti terambil min 1.
+      if (K === 1) return "66.7"; // (8C6 / 9C6) = 28/84 = 1/3 fail -> 66.67% success
+      if (K === 2) return "91.7"; // (7C6 / 9C6) = 7/84 fail -> 91.67% success
+      if (K === 3) return "98.8"; // (6C6 / 9C6) = 1/84 fail -> 98.81% success
+      return "0.0";
     }
 
     function loadDeckToBuilder(deckId) {
