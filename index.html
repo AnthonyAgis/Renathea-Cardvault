@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Renathea Cardvault - Card Search, Deckbuilder, Camp & Leaderboard</title>
   
-  <!-- Firebase SDK (Compat Version) -->
+  <!-- Firebase SDK (Compat Version untuk kemudahan integrasi tunggal) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -38,46 +38,14 @@
     header {
       background-color: #1a1a1a;
       color: #fff;
-      padding: 16px 24px;
+      padding: 20px;
+      text-align: center;
       border-bottom: 4px solid var(--primary);
     }
 
-    .header-container {
-      max-width: 1300px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .header-title h1 {
-      font-size: 1.6rem;
+    header h1 {
+      font-size: 1.8rem;
       letter-spacing: 1px;
-    }
-
-    .header-title p {
-      font-size: 0.85rem;
-      color: #aaa;
-    }
-
-    .btn-admin-nav {
-      background: #333;
-      color: #fff;
-      border: 1px solid #555;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-admin-nav:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
     }
 
     .nav-tabs {
@@ -90,11 +58,11 @@
     }
 
     .nav-tab-btn {
-      padding: 8px 16px;
+      padding: 8px 14px;
       background: transparent;
       color: #ccc;
       border: none;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       border-radius: 6px;
@@ -468,7 +436,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 380px;
+      max-height: 400px;
       overflow-y: auto;
       margin-bottom: 16px;
     }
@@ -576,32 +544,6 @@
       padding: 4px 8px;
       background: #fafafa;
       border-radius: 4px;
-    }
-
-    .prob-badge {
-      display: inline-block;
-      background: #e6f7ff;
-      color: #0050b3;
-      border: 1px solid #91d5ff;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-
-    .sim-card-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .sim-card-item {
-      background: #fafafa;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 0.82rem;
     }
 
     .camp-info-grid {
@@ -801,8 +743,8 @@
     .modal-content {
       background: #fff;
       border-radius: var(--radius);
-      max-width: 680px;
-      width: 92%;
+      max-width: 600px;
+      width: 90%;
       max-height: 90vh;
       overflow-y: auto;
       padding: 24px;
@@ -848,33 +790,23 @@
       .deck-panel {
         position: static;
       }
-      .header-container {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER DENGAN TOMBOL ADMIN DI SISI KANAN -->
   <header>
-    <div class="header-container">
-      <div class="header-title">
-        <h1>RENATHEA CARDVAULT</h1>
-        <p>Portal Database Kartu, Deck Builder, Renathea Camp & Powerboard Leaderboard</p>
-      </div>
-      <button class="btn-admin-nav" onclick="switchMainTab('admin-tab')">⚙️ Admin Dashboard</button>
-    </div>
+    <h1>RENATHEA CARDVAULT</h1>
+    <p>Portal Database Kartu, Deck Builder, Renathea Camp & Powerboard Leaderboard</p>
   </header>
 
-  <!-- TAB NAVIGASI UTAMA PEMAIN -->
   <div class="nav-tabs">
     <button class="nav-tab-btn active" onclick="switchMainTab('search-tab')">🔍 Database Kartu</button>
     <button class="nav-tab-btn" onclick="switchMainTab('deck-tab')">🃏 Deck Builder</button>
     <button class="nav-tab-btn" onclick="switchMainTab('community-tab')">👥 Deck Komunitas</button>
     <button class="nav-tab-btn" onclick="switchMainTab('camp-tab')">🏟️ Renathea Camp</button>
     <button class="nav-tab-btn" onclick="switchMainTab('leaderboard-tab')">🏆 Leaderboard</button>
+    <button class="nav-tab-btn" onclick="switchMainTab('admin-tab')">⚙️ Admin Dashboard</button>
   </div>
 
   <div class="container">
@@ -916,10 +848,9 @@
           <button class="chip-btn" data-value="Magic" onclick="toggleChip(this, 'search')">Magic</button>
           <button class="chip-btn" data-value="Support" onclick="toggleChip(this, 'search')">Support</button>
           <button class="chip-btn" data-value="Tank" onclick="toggleChip(this, 'search')">Tank</button>
-          <button class="chip-btn" data-value="No Role" onclick="toggleChip(this, 'search')">No Role</button>
         </div>
 
-        <div class="filter-group-title">Keyword / Skill Kartu</div>
+        <div class="filter-group-title">Keyword Kartu</div>
         <div class="chip-group" id="keyword-chips">
           <button class="chip-btn" data-value="Passive" onclick="toggleChip(this, 'search')">Passive</button>
           <button class="chip-btn" data-value="Powerup" onclick="toggleChip(this, 'search')">Powerup</button>
@@ -927,7 +858,6 @@
           <button class="chip-btn" data-value="Silence" onclick="toggleChip(this, 'search')">Silence</button>
           <button class="chip-btn" data-value="Protect" onclick="toggleChip(this, 'search')">Protect</button>
           <button class="chip-btn" data-value="Law" onclick="toggleChip(this, 'search')">Law</button>
-          <button class="chip-btn" data-value="No Skill" onclick="toggleChip(this, 'search')">No Skill</button>
         </div>
 
         <div class="filter-actions">
@@ -947,11 +877,8 @@
             <h2>Deck Anda</h2>
           </div>
 
-          <label style="font-size:0.8rem; font-weight:600; color:#555;">NICKNAME / USERNAME (OPSIONAL)</label>
-          <input type="text" id="deck-username-input" class="deck-input" placeholder="Masukkan Nickname Anda..." value="" />
-
           <label style="font-size:0.8rem; font-weight:600; color:#555;">NAMA DECK</label>
-          <input type="text" id="deck-name-input" class="deck-input" placeholder="Masukkan Nama Deck..." value="" />
+          <input type="text" id="deck-name-input" class="deck-input" placeholder="Masukkan Nama Deck..." value="Deck Utama Saya" />
 
           <label style="font-size:0.8rem; font-weight:600; color:#555;">CATATAN / STRATEGI DECK</label>
           <textarea id="deck-note-input" class="deck-textarea" placeholder="Tuliskan racikan atau strategi deck kamu di sini..."></textarea>
@@ -1007,10 +934,9 @@
               <button class="chip-btn" data-value="Magic" onclick="toggleChip(this, 'deck')">Magic</button>
               <button class="chip-btn" data-value="Support" onclick="toggleChip(this, 'deck')">Support</button>
               <button class="chip-btn" data-value="Tank" onclick="toggleChip(this, 'deck')">Tank</button>
-              <button class="chip-btn" data-value="No Role" onclick="toggleChip(this, 'deck')">No Role</button>
             </div>
 
-            <div class="filter-group-title">Keyword / Skill Kartu</div>
+            <div class="filter-group-title">Keyword Kartu</div>
             <div class="chip-group" id="deck-keyword-chips">
               <button class="chip-btn" data-value="Passive" onclick="toggleChip(this, 'deck')">Passive</button>
               <button class="chip-btn" data-value="Powerup" onclick="toggleChip(this, 'deck')">Powerup</button>
@@ -1018,7 +944,6 @@
               <button class="chip-btn" data-value="Silence" onclick="toggleChip(this, 'deck')">Silence</button>
               <button class="chip-btn" data-value="Protect" onclick="toggleChip(this, 'deck')">Protect</button>
               <button class="chip-btn" data-value="Law" onclick="toggleChip(this, 'deck')">Law</button>
-              <button class="chip-btn" data-value="No Skill" onclick="toggleChip(this, 'deck')">No Skill</button>
             </div>
 
             <div class="filter-actions">
@@ -1089,6 +1014,7 @@
         </div>
       </div>
 
+      <!-- Direktori Daftar Camp Resmi -->
       <div class="section-box">
         <h2 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Daftar Renathea Camp Resmi</h2>
         <div class="camp-directory-grid" id="camp-directory-grid">
@@ -1096,6 +1022,7 @@
         </div>
       </div>
 
+      <!-- Jadwal Camp Aktif dari Admin -->
       <div class="section-box">
         <h2 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Jadwal Aktif Renathea Camp</h2>
         <div id="schedule-list-box">
@@ -1128,9 +1055,10 @@
       </div>
     </div>
 
-    <!-- TAB 6: ADMIN DASHBOARD -->
+    <!-- TAB 6: ADMIN DASHBOARD / LOGIN -->
     <div id="admin-tab" class="tab-content">
       
+      <!-- Tampilan Form Login Admin -->
       <div id="admin-login-box" class="admin-auth-box">
         <h2 style="margin-bottom: 16px; color: #111;">Admin Login</h2>
         <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Masukkan password admin untuk mengakses panel pengelola.</p>
@@ -1138,12 +1066,14 @@
         <button class="btn btn-primary" style="width: 100%; padding: 10px;" onclick="handleAdminLogin()">Masuk Dashboard</button>
       </div>
 
+      <!-- Tampilan Dashboard Admin (Terproteksi) -->
       <div id="admin-dashboard-box" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h2>Panel Pengelola Admin</h2>
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
         </div>
 
+        <!-- 1. Form Manajemen Daftar Camp -->
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">🏕️ Tambah / Kelola Renathea Camp Resmi</h3>
           <div class="search-row" style="margin-bottom: 10px;">
@@ -1173,6 +1103,7 @@
           <button class="btn btn-primary" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori Cloud</button>
         </div>
 
+        <!-- 2. Form Submit Jadwal Renathea Camp -->
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">📅 Publikasikan Jadwal Renathea Camp</h3>
           <div class="search-row" style="margin-bottom: 10px;">
@@ -1204,6 +1135,7 @@
           <button class="btn btn-primary" onclick="submitCampSchedule()">📢 Publikasikan Jadwal ke Cloud</button>
         </div>
 
+        <!-- 3. Form Kelola Leaderboard / Powerboard -->
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">🏆 Tambah / Update Leaderboard Pemain</h3>
           <div class="search-row" style="margin-bottom: 10px;">
@@ -1225,6 +1157,7 @@
           <button class="btn btn-primary" onclick="submitLeaderboardEntry()">💾 Simpan & Auto-Rank di Cloud</button>
         </div>
 
+        <!-- 4. Form Kelola Database Kartu -->
         <div class="admin-layout">
           <div class="admin-form-card">
             <div class="deck-header" style="margin-bottom:12px;">
@@ -1326,7 +1259,6 @@
     </div>
   </div>
 
-  <!-- MODAL DETAIL KARTU -->
   <div class="modal-overlay" id="card-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -1338,52 +1270,11 @@
     </div>
   </div>
 
-  <!-- MODAL UJI DECK & ANALISIS PROBABILITAS -->
-  <div class="modal-overlay" id="deck-test-modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeTestModal()">&times;</button>
-      <div class="modal-header">
-        <h2 id="test-modal-title">🧪 Uji Deck & Analisis Probabilitas</h2>
-        <span id="test-modal-sub" style="font-size: 0.85rem; color: #666;">Draw Simulasi 6 Kartu Awal (Hipergeometrik)</span>
-      </div>
-
-      <!-- BAGIAN SIMULATOR HAND -->
-      <div style="background:#f8f9fa; border:1px solid var(--border-color); padding:16px; border-radius:6px; margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="font-size:1.05rem;">🃏 Hand Draw Awal (6 Kartu)</h3>
-          <button class="btn btn-primary" style="padding:6px 14px; font-size:0.82rem;" onclick="reshuffleTestHand()">🎲 Ulangi Kocok Hand</button>
-        </div>
-        <div id="sim-hand-container" class="sim-card-list"></div>
-        <div style="font-size:0.85rem; font-weight:600; color:#444;" id="sim-hand-stats"></div>
-      </div>
-
-      <!-- BAGIAN ANALISIS PROBABILITAS METEMATIS -->
-      <div>
-        <h3 style="font-size:1.05rem; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:4px;">📊 Analisis Konsistensi & Peluang Draw (6 dari 9 Kartu)</h3>
-        
-        <div style="margin-bottom:16px;">
-          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">1. Statis Dasar Matriks Hand Awal</h4>
-          <ul style="font-size:0.85rem; color:#333; padding-left:20px; line-height:1.6;">
-            <li>Peluang **1 Kartu Spesifik** (Key Card) ditarik ke Hand Awal: <span class="prob-badge">66.67%</span></li>
-            <li>Peluang **2 Kartu Combo Spesifik** (Key A + Key B) keduanya ditarik ke Hand Awal: <span class="prob-badge">41.67%</span></li>
-            <li>Ekspektasi Total Raw Power di Hand Awal: <strong id="stat-expected-power">0</strong> (Min: <span id="stat-min-power">0</span>, Max: <span id="stat-max-power">0</span>)</li>
-          </ul>
-        </div>
-
-        <div style="margin-bottom:16px;">
-          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">2. Peluang Ditarik Berdasarkan Role Kartu (Min 1 Kartu)</h4>
-          <div id="stat-role-breakdown" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-        </div>
-
-        <div>
-          <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">3. Peluang Ditarik Berdasarkan Keyword / Skill (Min 1 Kartu)</h4>
-          <div id="stat-keyword-breakdown" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
+    // =========================================================================
+    // ⚠️ KONFIGURASI FIREBASE CLOUD FIRESTORE
+    // Gantikan nilai di bawah ini denganfirebaseConfig dari Firebase Console Anda
+    // =========================================================================
     const firebaseConfig = {
       apiKey: "PASTE_API_KEY_ANDA_DI_SINI",
       authDomain: "renathea-cardvault.firebaseapp.com",
@@ -1393,9 +1284,11 @@
       appId: "1:1234567890:web:abcdef123456"
     };
 
+    // Inisialisasi Firebase & Firestore
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // Data Kartu Default Bawaan Aplikasi
     const defaultCards = [
       {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
       {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
@@ -1487,9 +1380,8 @@
     let campDirectories = [];
     let leaderboardData = [];
     let isAdminLoggedIn = false;
-    let currentTestDeckObj = null;
 
-    // REAL-TIME CLOUD LISTENERS
+    // 1. LISTEN TO COMMUNITY DECKS FROM CLOUD (REAL-TIME)
     function listenToCommunityDecks() {
       db.collection("community_decks").orderBy("createdAt", "desc")
         .onSnapshot((snapshot) => {
@@ -1504,37 +1396,56 @@
             });
           });
           renderCommunityDecks();
-        }, (error) => console.error("Gagal membaca deck komunitas:", error));
+        }, (error) => {
+          console.error("Gagal mendengarkan deck komunitas:", error);
+        });
     }
 
+    // 2. LISTEN TO CAMP DIRECTORY FROM CLOUD (REAL-TIME)
     function listenToCampDirectories() {
       db.collection("camp_directories").orderBy("createdAt", "desc")
         .onSnapshot((snapshot) => {
           campDirectories = [];
-          snapshot.forEach((doc) => campDirectories.push({ id: doc.id, ...doc.data() }));
+          snapshot.forEach((doc) => {
+            campDirectories.push({ id: doc.id, ...doc.data() });
+          });
           renderCampDirectories();
-        }, (error) => console.error("Gagal membaca direktori camp:", error));
+        }, (error) => {
+          console.error("Gagal mendengarkan direktori camp:", error);
+        });
     }
 
+    // 3. LISTEN TO CAMP SCHEDULES FROM CLOUD (REAL-TIME)
     function listenToCampSchedules() {
       db.collection("camp_schedules").orderBy("createdAt", "desc")
         .onSnapshot((snapshot) => {
           campSchedules = [];
-          snapshot.forEach((doc) => campSchedules.push({ id: doc.id, ...doc.data() }));
+          snapshot.forEach((doc) => {
+            campSchedules.push({ id: doc.id, ...doc.data() });
+          });
           renderCampSchedules();
-        }, (error) => console.error("Gagal membaca jadwal camp:", error));
+        }, (error) => {
+          console.error("Gagal mendengarkan jadwal camp:", error);
+        });
     }
 
+    // 4. LISTEN TO LEADERBOARD FROM CLOUD (REAL-TIME & AUTO RANK)
     function listenToLeaderboard() {
       db.collection("leaderboard").orderBy("power", "desc")
         .onSnapshot((snapshot) => {
           leaderboardData = [];
           let rankIndex = 1;
           snapshot.forEach((doc) => {
-            leaderboardData.push({ id: doc.id, rank: rankIndex++, ...doc.data() });
+            leaderboardData.push({
+              id: doc.id,
+              rank: rankIndex++,
+              ...doc.data()
+            });
           });
           renderLeaderboardTable();
-        }, (error) => console.error("Gagal membaca leaderboard:", error));
+        }, (error) => {
+          console.error("Gagal mendengarkan leaderboard:", error);
+        });
     }
 
     function formatSkillText(skillText) {
@@ -1547,7 +1458,7 @@
       document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-      const tabs = ['search-tab', 'deck-tab', 'community-tab', 'camp-tab', 'leaderboard-tab'];
+      const tabs = ['search-tab', 'deck-tab', 'community-tab', 'camp-tab', 'leaderboard-tab', 'admin-tab'];
       const btnIndex = tabs.indexOf(tabId);
       if (btnIndex >= 0) document.querySelectorAll('.nav-tab-btn')[btnIndex].classList.add('active');
 
@@ -1566,6 +1477,7 @@
       applyFilters(context);
     }
 
+    // TAB DATABASE KARTU: TANPA TOMBOL TAMBAH DECK
     function renderCards(cards) {
       const grid = document.getElementById('card-grid');
       const countLabel = document.getElementById('results-count');
@@ -1604,6 +1516,7 @@
       });
     }
 
+    // TAB DECK BUILDER: DENGAN TOMBOL TAMBAH DECK
     function renderDeckAvailableGrid(cards) {
       const grid = document.getElementById('deck-available-grid');
       const countLabel = document.getElementById('deck-results-count');
@@ -1653,40 +1566,13 @@
       const activeKeywords = Array.from(document.querySelectorAll(`#${prefix}keyword-chips .chip-btn.active`)).map(b => b.getAttribute('data-value').toLowerCase());
 
       const filtered = allCards.filter(card => {
-        const matchesQuery = !query || 
-          (card.name && card.name.toLowerCase().includes(query)) || 
-          (card.skill && card.skill.toLowerCase().includes(query)) || 
-          (card.keyword && card.keyword.toLowerCase().includes(query)) || 
-          (card.classId && card.classId.toLowerCase().includes(query)) || 
-          (card.cardId && card.cardId.toLowerCase().includes(query));
-
+        const matchesQuery = !query || card.name.toLowerCase().includes(query) || card.skill.toLowerCase().includes(query) || card.keyword.toLowerCase().includes(query) || card.classId.toLowerCase().includes(query) || card.cardId.toLowerCase().includes(query);
         const matchesCat = !selectedCat || card.category === selectedCat;
         const matchesSet = !selectedSet || card.set === selectedSet;
-
-        const cardRoleRaw = (card.role || "").trim();
-        const cardRoleLower = cardRoleRaw.toLowerCase();
-        const isNoRole = !cardRoleRaw || cardRoleRaw === "-";
-
-        let matchesRole = true;
-        if (activeRoles.length > 0) {
-          matchesRole = activeRoles.every(r => {
-            if (r === 'no role') return isNoRole;
-            return cardRoleLower.includes(r);
-          });
-        }
-
-        const cardKeywordRaw = (card.keyword || "").trim();
-        const cardSkillRaw = (card.skill || "").trim();
-        const cardKeywordLower = cardKeywordRaw.toLowerCase();
-        const isNoSkill = (!cardSkillRaw || cardSkillRaw === "-") && (!cardKeywordRaw || cardKeywordRaw === "-");
-
-        let matchesKeyword = true;
-        if (activeKeywords.length > 0) {
-          matchesKeyword = activeKeywords.every(kw => {
-            if (kw === 'no skill') return isNoSkill;
-            return cardKeywordLower.includes(kw);
-          });
-        }
+        const cardRoleLower = (card.role || "").toLowerCase();
+        const matchesRole = activeRoles.length === 0 || activeRoles.every(r => cardRoleLower.includes(r));
+        const cardKeywordLower = (card.keyword || "").toLowerCase();
+        const matchesKeyword = activeKeywords.length === 0 || activeKeywords.every(kw => cardKeywordLower.includes(kw));
 
         return matchesQuery && matchesCat && matchesSet && matchesRole && matchesKeyword;
       });
@@ -1720,18 +1606,8 @@
       renderDeckUI();
     }
 
-    function clearDeckForm() {
-      document.getElementById('deck-name-input').value = "";
-      document.getElementById('deck-note-input').value = "";
-      document.getElementById('deck-username-input').value = "";
-      userDeck = [];
-      renderDeckUI();
-    }
-
     function clearCurrentDeck() {
-      if (confirm("Kosongkan deck dan form?")) {
-        clearDeckForm();
-      }
+      if (confirm("Kosongkan deck?")) { userDeck = []; renderDeckUI(); }
     }
 
     function renderDeckUI() {
@@ -1763,10 +1639,10 @@
       });
     }
 
+    // PUBLIKASI DECK KE CLOUD FIRESTORE (WAJIB 9 KARTU)
     function publishDeckToCommunity() {
       const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
       const deckNote = document.getElementById('deck-note-input').value.trim();
-      const username = document.getElementById('deck-username-input').value.trim() || "Pemain Komunitas";
 
       if (userDeck.length < 9) {
         alert(`⚠️ Deck belum lengkap! Harus berisi persis 9 kartu untuk dipublikasikan. (Saat ini baru ${userDeck.length}/9 kartu)`);
@@ -1776,21 +1652,20 @@
       const newDeck = {
         name: deckName,
         note: deckNote,
-        author: username,
         cards: userDeck.map(c => c.cardId),
         totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
+        author: "Pemain Komunitas",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
       db.collection("community_decks").add(newDeck)
         .then(() => {
-          alert("🌐 Berhasil dipublikasikan ke server cloud!");
-          clearDeckForm();
+          alert("🌐 Berhasil dipublikasikan ke server cloud global!");
           switchMainTab('community-tab');
         })
         .catch((err) => {
           console.error("Gagal menyimpan ke cloud:", err);
-          alert("❌ Gagal terhubung ke server cloud!");
+          alert("❌ Gagal terhubung ke server cloud! Periksa koneksi internet atau konfigurasi Firebase.");
         });
     }
 
@@ -1819,147 +1694,16 @@
         deckEl.className = 'community-deck-card';
         deckEl.innerHTML = `
           <div class="community-deck-title">${deck.name}</div>
-          <div class="community-deck-meta">Oleh: <strong>${deck.author}</strong> | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
+          <div class="community-deck-meta">Oleh: ${deck.author} | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
           <div class="community-deck-note">"${deck.note || '-'}"</div>
           <div class="community-card-preview-list">${cardRowsHtml}</div>
-          <div style="display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap;">
-            <button class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:6px 8px;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
-            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji Deck & Analisis</button>
-            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.8rem; padding:6px 8px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
+          <div style="display: flex; gap: 8px; margin-top: auto;">
+            <button class="btn btn-primary" style="flex:1; font-size:0.85rem;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
+            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.85rem;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
           </div>
         `;
         grid.appendChild(deckEl);
       });
-    }
-
-    // FUNGSI UJI DECK & ANALISIS PROBABILITAS
-    function openTestDeckModal(deckId) {
-      const deck = communityDecks.find(d => d.id === deckId);
-      if (!deck) return;
-
-      currentTestDeckObj = deck;
-      document.getElementById('test-modal-title').textContent = `🧪 Uji Deck: ${deck.name}`;
-      document.getElementById('test-modal-sub').textContent = `Oleh: ${deck.author} | Total Power Deck: ${deck.totalPower}`;
-
-      // Hitung Analisis Statis Matematika
-      calculateDeckProbabilities(deck);
-
-      // Jalankan Simulasi Draw Hand Pertama
-      reshuffleTestHand();
-
-      document.getElementById('deck-test-modal').classList.add('active');
-    }
-
-    function closeTestModal() {
-      document.getElementById('deck-test-modal').classList.remove('active');
-    }
-
-    function reshuffleTestHand() {
-      if (!currentTestDeckObj) return;
-
-      const deckCards = currentTestDeckObj.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
-      
-      // Shuffle Fisher-Yates
-      const shuffled = [...deckCards];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-
-      const hand6 = shuffled.slice(0, 6);
-      const remaining3 = shuffled.slice(6, 9);
-
-      const simContainer = document.getElementById('sim-hand-container');
-      simContainer.innerHTML = "";
-
-      let handPower = 0;
-      hand6.forEach((c, idx) => {
-        handPower += (parseInt(c.power) || 0);
-        const cardBox = document.createElement('div');
-        cardBox.className = 'sim-card-item';
-        cardBox.innerHTML = `
-          <div style="font-weight:bold; color:#111;">${idx + 1}. ${c.name}</div>
-          <div style="font-size:0.75rem; color:#666;">${c.role || 'No Role'} | PWR: ${c.power}</div>
-        `;
-        simContainer.appendChild(cardBox);
-      });
-
-      document.getElementById('sim-hand-stats').innerHTML = `
-        Total Raw Power Hand Awal: <span style="color:var(--primary); font-size:1rem;">${handPower}</span> | 
-        Kartu Tertahan di Deck (3 Kartu): <strong>${remaining3.map(c => c.name).join(', ')}</strong>
-      `;
-    }
-
-    // HITUNG KALKULASI PELUANG HIPERGEOMETRIK
-    function calculateDeckProbabilities(deck) {
-      const fullCards = deck.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
-
-      // 1. Statis Power
-      const expectedPower = ( (6 / 9) * deck.totalPower ).toFixed(1);
-      const powers = fullCards.map(c => parseInt(c.power) || 0).sort((a,b) => a - b);
-      
-      // Min 6 power & Max 6 power
-      const minPower = powers.slice(0, 6).reduce((a, b) => a + b, 0);
-      const maxPower = powers.slice(3, 9).reduce((a, b) => a + b, 0);
-
-      document.getElementById('stat-expected-power').textContent = expectedPower;
-      document.getElementById('stat-min-power').textContent = minPower;
-      document.getElementById('stat-max-power').textContent = maxPower;
-
-      // 2. Peluang Kombinasi Role (Peluang minimal ditarik 1 kartu role tersebut di 6 draw awal)
-      const rolesList = ['Tank', 'Melee', 'Agility', 'Ranged', 'Magic', 'Support', 'No Role'];
-      const roleBreakdownEl = document.getElementById('stat-role-breakdown');
-      roleBreakdownEl.innerHTML = "";
-
-      rolesList.forEach(role => {
-        let count = 0;
-        if (role === 'No Role') {
-          count = fullCards.filter(c => !c.role || c.role === '-' || c.role.trim() === '').length;
-        } else {
-          count = fullCards.filter(c => c.role && c.role.toLowerCase().includes(role.toLowerCase())).length;
-        }
-
-        if (count > 0) {
-          const prob = getHypergeometricProbAtLeastOne(count);
-          roleBreakdownEl.innerHTML += `
-            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
-              <strong>${role}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
-            </div>
-          `;
-        }
-      });
-
-      // 3. Peluang Kombinasi Keyword / Skill
-      const keywordsList = ['Powerup', 'Silence', 'Protect', 'Law', 'Copy', 'Passive', 'No Skill'];
-      const kwBreakdownEl = document.getElementById('stat-keyword-breakdown');
-      kwBreakdownEl.innerHTML = "";
-
-      keywordsList.forEach(kw => {
-        let count = 0;
-        if (kw === 'No Skill') {
-          count = fullCards.filter(c => (!c.skill || c.skill === '-') && (!c.keyword || c.keyword === '-')).length;
-        } else {
-          count = fullCards.filter(c => c.keyword && c.keyword.toLowerCase().includes(kw.toLowerCase())).length;
-        }
-
-        if (count > 0) {
-          const prob = getHypergeometricProbAtLeastOne(count);
-          kwBreakdownEl.innerHTML += `
-            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
-              <strong>${kw}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
-            </div>
-          `;
-        }
-      });
-    }
-
-    // Matematika hipergeometrik: Peluang ditarik MINIMAL 1 dari K kartu sukses dalam 9 kartu ketika mengambil 6 kartu
-    function getHypergeometricProbAtLeastOne(K) {
-      if (K >= 4) return "100.0"; // Jika dalam 9 kartu ada 4+ kartu target, dan kita ambil 6, pasti terambil min 1.
-      if (K === 1) return "66.7"; // (8C6 / 9C6) = 28/84 = 1/3 fail -> 66.67% success
-      if (K === 2) return "91.7"; // (7C6 / 9C6) = 7/84 fail -> 91.67% success
-      if (K === 3) return "98.8"; // (6C6 / 9C6) = 1/84 fail -> 98.81% success
-      return "0.0";
     }
 
     function loadDeckToBuilder(deckId) {
@@ -1967,7 +1711,6 @@
       if (!target) return;
       document.getElementById('deck-name-input').value = target.name;
       document.getElementById('deck-note-input').value = target.note;
-      document.getElementById('deck-username-input').value = target.author !== "Pemain Komunitas" ? target.author : "";
       userDeck = target.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
       switchMainTab('deck-tab');
       alert(`✅ Deck dimuat ke Deck Builder!`);
@@ -2314,7 +2057,7 @@
 
     function closeModal() { document.getElementById('card-modal').classList.remove('active'); }
 
-    // INITIALIZATION
+    // INITIALIZATION (MEMANGGIL REALTIME LISTENER CLOUD)
     listenToCommunityDecks();
     listenToCampDirectories();
     listenToCampSchedules();
