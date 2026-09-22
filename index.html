@@ -669,6 +669,18 @@
       font-weight: 600;
     }
 
+    .format-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .badge-origin { background: #e2f0d9; color: #385723; border: 1px solid #c5e0b4; }
+    .badge-ark { background: #fff2cc; color: #b25900; border: 1px solid #ffe599; }
+
     .sim-card-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -1053,6 +1065,12 @@
             <h2>Deck Anda</h2>
           </div>
 
+          <label style="font-size:0.8rem; font-weight:600; color:#555;">FORMAT PERTANDINGAN</label>
+          <select id="deck-format-select" class="deck-input" onchange="onFormatChange()">
+            <option value="Origin">Origin Format (Max 9 Kartu)</option>
+            <option value="Ark">Ark Format (Max 12 Kartu / 9 Main + 3 Reserve)</option>
+          </select>
+
           <label style="font-size:0.8rem; font-weight:600; color:#555;">NICKNAME / USERNAME (OPSIONAL)</label>
           <input type="text" id="deck-username-input" class="deck-input" placeholder="Masukkan Nickname Anda..." value="" />
 
@@ -1155,7 +1173,7 @@
         <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck pemenang turnamen resmi.</p>
       </div>
 
-      <!-- Panel Statistik Meta Deck (Hanya Untuk Deck Kompetitif) -->
+      <!-- Panel Statistik Meta Deck -->
       <div class="meta-stats-panel" id="meta-stats-panel">
         <div class="meta-stat-box">
           <div class="meta-stat-title">🔥 Top 5 Kartu Meta</div>
@@ -1171,12 +1189,17 @@
         </div>
       </div>
 
-      <!-- Filter Deck List -->
-      <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center;">
-        <span style="font-weight: 600; font-size: 0.9rem;">Tampilkan Deck:</span>
-        <button class="btn btn-secondary" id="filter-all-decks" onclick="setDeckFilter('all')" style="background:var(--primary); color:#fff;">Semua Deck</button>
+      <!-- Filter Deck List (Format & Kategori) -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap;">
+        <span style="font-weight: 600; font-size: 0.9rem;">Format:</span>
+        <button class="btn btn-secondary" id="filter-format-all" onclick="setFormatFilter('all')" style="background:var(--primary); color:#fff;">Semua Format</button>
+        <button class="btn btn-secondary" id="filter-format-origin" onclick="setFormatFilter('Origin')">Origin</button>
+        <button class="btn btn-secondary" id="filter-format-ark" onclick="setFormatFilter('Ark')">Ark</button>
+
+        <span style="font-weight: 600; font-size: 0.9rem; margin-left: 15px;">Tipe:</span>
+        <button class="btn btn-secondary" id="filter-all-decks" onclick="setDeckFilter('all')" style="background:var(--primary); color:#fff;">Semua</button>
         <button class="btn btn-secondary" id="filter-champ-decks" onclick="setDeckFilter('championship')">🏆 Juara Turnamen</button>
-        <button class="btn btn-secondary" id="filter-comm-decks" onclick="setDeckFilter('community')">👥 Komunitas Publik</button>
+        <button class="btn btn-secondary" id="filter-comm-decks" onclick="setDeckFilter('community')">👥 Komunitas</button>
       </div>
 
       <div class="community-grid" id="community-deck-grid">
@@ -1291,25 +1314,34 @@
         <!-- ADMIN: PUBLIKASI DECK JUARA -->
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #d4af37; background: #fffdf5;">
           <h3 style="margin-bottom: 14px; color: #8a7300;">🏆 Publikasikan Deck Juara Turnamen (Masuk Meta)</h3>
-          <p style="font-size: 0.85rem; color: #555; margin-bottom: 12px;">Deck yang diunggah melalui panel ini akan ditandai sebagai "Deck Juara" dan akan menjadi satu-satunya data yang dihitung dalam Analisis Meta Deck.</p>
+          <p style="font-size: 0.85rem; color: #555; margin-bottom: 12px;">Deck yang diunggah melalui panel ini akan ditandai sebagai "Deck Juara" dan akan masuk ke perhitungan Analisis Meta.</p>
           
           <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Format Pertandingan</label>
+              <select id="admin-champ-format" class="deck-input" style="margin-bottom:0;">
+                <option value="Origin">Origin Format</option>
+                <option value="Ark">Ark Format</option>
+              </select>
+            </div>
             <div class="admin-form-group" style="flex: 1;">
               <label>Nama / Gelar Juara (Event)</label>
               <input type="text" id="admin-champ-event" placeholder="Misal: Juara 1 TarCamp Season 1">
             </div>
+          </div>
+          <div class="search-row" style="margin-bottom: 10px;">
             <div class="admin-form-group" style="flex: 1;">
               <label>Nama Pemain</label>
               <input type="text" id="admin-champ-player" placeholder="Misal: Budi">
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Catatan Admin (Opsional)</label>
+              <input type="text" id="admin-champ-note" placeholder="Misal: Deck andalan...">
             </div>
           </div>
           <div class="admin-form-group" style="margin-bottom: 14px;">
             <label>Kode Deck (Paste kode Base64)</label>
             <input type="text" id="admin-champ-code" placeholder="Paste kode deck di sini...">
-          </div>
-          <div class="admin-form-group" style="margin-bottom: 14px;">
-            <label>Catatan Admin (Opsional)</label>
-            <input type="text" id="admin-champ-note" placeholder="Misal: Deck andalan yang mendominasi meta...">
           </div>
           <button class="btn btn-primary" style="background:#d4af37; color:#000;" onclick="submitChampionshipDeck()">🏆 Unggah Deck Juara</button>
         </div>
@@ -1548,7 +1580,7 @@
 
       <!-- BAGIAN ANALISIS PROBABILITAS METEMATIS -->
       <div>
-        <h3 style="font-size:1.05rem; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:4px;">📊 Analisis Konsistensi & Peluang Draw (6 dari 9 Kartu)</h3>
+        <h3 style="font-size:1.05rem; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:4px;">📊 Analisis Konsistensi & Peluang Draw</h3>
         
         <div style="margin-bottom:16px;">
           <h4 style="font-size:0.9rem; color:#555; margin-bottom:6px;">1. Statis Dasar Matriks Hand Awal</h4>
@@ -1678,6 +1710,7 @@
     let isAdminLoggedIn = false;
     let currentTestDeckObj = null;
     let activeDeckFilter = 'all';
+    let activeFormatFilter = 'all'; // 'all', 'Origin', 'Ark'
 
     // REAL-TIME CLOUD LISTENERS
     function listenToCommunityDecks() {
@@ -1689,6 +1722,7 @@
             const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID');
             communityDecks.push({
               id: doc.id,
+              format: data.format || 'Origin', // Fallback default
               ...data,
               updatedAt: dateStr
             });
@@ -1894,12 +1928,35 @@
       applyFilters(context);
     }
 
+    function onFormatChange() {
+      const format = document.getElementById('deck-format-select').value;
+      const maxLimit = format === 'Origin' ? 9 : 12;
+      if (userDeck.length > maxLimit) {
+        userDeck = userDeck.slice(0, maxLimit);
+        alert(`⚠️ Format diubah ke ${format}. Deck dipotong menjadi maksimal ${maxLimit} kartu.`);
+      }
+      renderDeckUI();
+    }
+
     function addCardToDeck(cardId) {
       const card = allCards.find(c => c.cardId === cardId);
       if (!card) return;
-      if (userDeck.length >= 9) { alert("⚠️ Deck penuh! Maksimal 9 kartu."); return; }
-      if (userDeck.some(c => c.cardId === card.cardId)) { alert(`⚠️ Kartu '${card.name}' sudah ada di deck!`); return; }
-      if (card.classId && card.classId !== "-" && userDeck.some(c => c.classId === card.classId)) { alert(`⚠️ Class ID '${card.classId}' sudah dipakai!`); return; }
+
+      const format = document.getElementById('deck-format-select').value;
+      const maxLimit = format === 'Origin' ? 9 : 12;
+
+      if (userDeck.length >= maxLimit) { 
+        alert(`⚠️ Deck penuh! Maksimal ${maxLimit} kartu untuk ${format} Format.`); 
+        return; 
+      }
+      if (userDeck.some(c => c.cardId === card.cardId)) { 
+        alert(`⚠️ Kartu '${card.name}' sudah ada di deck!`); 
+        return; 
+      }
+      if (card.classId && card.classId !== "-" && userDeck.some(c => c.classId === card.classId)) { 
+        alert(`⚠️ Class ID '${card.classId}' sudah dipakai! Setiap kartu wajib memiliki Class ID yang unik.`); 
+        return; 
+      }
 
       userDeck.push(card);
       renderDeckUI();
@@ -1928,8 +1985,10 @@
       const listContainer = document.getElementById('deck-card-list');
       const countEl = document.getElementById('deck-card-count');
       const powerEl = document.getElementById('deck-total-power');
+      const format = document.getElementById('deck-format-select').value;
+      const maxLimit = format === 'Origin' ? 9 : 12;
 
-      countEl.textContent = `${userDeck.length}/9`;
+      countEl.textContent = `${userDeck.length}/${maxLimit}`;
       let totalPower = userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0);
       powerEl.textContent = totalPower;
 
@@ -1942,9 +2001,10 @@
       userDeck.forEach((card, idx) => {
         const item = document.createElement('div');
         item.className = 'deck-card-item';
+        const labelReserve = (format === 'Ark' && idx >= 9) ? ' <span style="color:#d4af37; font-weight:bold;">(Reserve)</span>' : '';
         item.innerHTML = `
           <div class="deck-card-info">
-            <span class="deck-card-name">${idx + 1}. ${card.name}</span>
+            <span class="deck-card-name">${idx + 1}. ${card.name}${labelReserve}</span>
             <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
           </div>
           <button class="btn-remove-card" onclick="removeCardFromDeck(${idx})">&times;</button>
@@ -1966,8 +2026,11 @@
     }
 
     function exportDeckCode() {
-      if (userDeck.length < 9) {
-        alert(`⚠️ Deck belum lengkap (${userDeck.length}/9). Isi penuh deck sebelum menyalin kode!`);
+      const format = document.getElementById('deck-format-select').value;
+      const reqCount = format === 'Origin' ? 9 : 12;
+
+      if (userDeck.length < reqCount) {
+        alert(`⚠️ Deck belum lengkap (${userDeck.length}/${reqCount}). Isi penuh deck sesuai format ${format} sebelum menyalin kode!`);
         return;
       }
       
@@ -1996,9 +2059,12 @@
         const idString = atob(base64Code);
         const shortCodes = idString.split(',');
 
-        if (shortCodes.length !== 9) {
+        if (shortCodes.length !== 9 && shortCodes.length !== 12) {
           throw new Error("Jumlah kartu tidak valid");
         }
+
+        const formatDetected = shortCodes.length === 12 ? 'Ark' : 'Origin';
+        document.getElementById('deck-format-select').value = formatDetected;
 
         const importedCards = [];
         for (let i = 0; i < shortCodes.length; i++) {
@@ -2032,7 +2098,7 @@
         userDeck = importedCards;
         renderDeckUI();
         document.getElementById('deck-code-input').value = "";
-        alert("✅ Deck berhasil di-import!");
+        alert(`✅ Deck ${formatDetected} berhasil di-import!`);
 
       } catch (e) {
         alert("❌ Kode deck tidak valid atau rusak!");
@@ -2055,12 +2121,14 @@
     }
 
     function publishDeckToCommunity() {
+      const format = document.getElementById('deck-format-select').value;
+      const reqCount = format === 'Origin' ? 9 : 12;
       const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
       const deckNote = document.getElementById('deck-note-input').value.trim();
       const username = document.getElementById('deck-username-input').value.trim() || "Pemain Komunitas";
 
-      if (userDeck.length < 9) {
-        alert(`⚠️ Deck belum lengkap! Harus berisi persis 9 kartu untuk dipublikasikan. (Saat ini baru ${userDeck.length}/9 kartu)`);
+      if (userDeck.length < reqCount) {
+        alert(`⚠️ Deck belum lengkap! Format ${format} harus berisi ${reqCount} kartu. (Saat ini baru ${userDeck.length}/${reqCount} kartu)`);
         return;
       }
 
@@ -2068,6 +2136,7 @@
         name: deckName,
         note: deckNote,
         author: username,
+        format: format,
         cards: userDeck.map(c => c.cardId),
         totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
         isChampionship: false,
@@ -2087,6 +2156,7 @@
     }
 
     function submitChampionshipDeck() {
+       const format = document.getElementById('admin-champ-format').value;
        const eventName = document.getElementById('admin-champ-event').value.trim();
        const playerName = document.getElementById('admin-champ-player').value.trim();
        const base64Code = document.getElementById('admin-champ-code').value.trim();
@@ -2101,7 +2171,8 @@
        try {
           const idString = atob(base64Code); 
           const shortCodes = idString.split(',');
-          if (shortCodes.length !== 9) throw new Error();
+          const reqCount = format === 'Origin' ? 9 : 12;
+          if (shortCodes.length !== reqCount) throw new Error();
           
           for (let i = 0; i < shortCodes.length; i++) {
              const shortCode = shortCodes[i];
@@ -2113,7 +2184,7 @@
              importedCardsIds.push(fullId);
           }
        } catch (e) {
-          alert("❌ Kode deck tidak valid atau rusak!");
+          alert("❌ Kode deck tidak valid atau jumlah kartu tidak sesuai dengan format yang dipilih!");
           return;
        }
        
@@ -2127,6 +2198,7 @@
         name: eventName,
         note: note,
         author: playerName,
+        format: format,
         cards: importedCardsIds,
         totalPower: totalPwr,
         isChampionship: true,
@@ -2223,6 +2295,21 @@
       document.getElementById('meta-top-sets').innerHTML = topSetsHtml || "<div style='color:#888; font-size:0.85rem;'>Tidak ada data Set</div>";
     }
 
+    function setFormatFilter(formatType) {
+      activeFormatFilter = formatType;
+      
+      document.getElementById('filter-format-all').style.background = formatType === 'all' ? 'var(--primary)' : '#e0e0e0';
+      document.getElementById('filter-format-all').style.color = formatType === 'all' ? '#fff' : 'var(--text-main)';
+      
+      document.getElementById('filter-format-origin').style.background = formatType === 'Origin' ? 'var(--primary)' : '#e0e0e0';
+      document.getElementById('filter-format-origin').style.color = formatType === 'Origin' ? '#fff' : 'var(--text-main)';
+      
+      document.getElementById('filter-format-ark').style.background = formatType === 'Ark' ? 'var(--primary)' : '#e0e0e0';
+      document.getElementById('filter-format-ark').style.color = formatType === 'Ark' ? '#fff' : 'var(--text-main)';
+      
+      renderCommunityDecks();
+    }
+
     function setDeckFilter(filterType) {
        activeDeckFilter = filterType;
        
@@ -2245,10 +2332,17 @@
       grid.innerHTML = "";
       
       let displayDecks = communityDecks;
+
+      // Filter Format
+      if (activeFormatFilter !== 'all') {
+         displayDecks = displayDecks.filter(d => d.format === activeFormatFilter);
+      }
+
+      // Filter Tipe (Champ vs Comm)
       if (activeDeckFilter === 'championship') {
-         displayDecks = communityDecks.filter(d => d.isChampionship === true);
+         displayDecks = displayDecks.filter(d => d.isChampionship === true);
       } else if (activeDeckFilter === 'community') {
-         displayDecks = communityDecks.filter(d => d.isChampionship !== true);
+         displayDecks = displayDecks.filter(d => d.isChampionship !== true);
       }
 
       if (displayDecks.length === 0) {
@@ -2260,21 +2354,28 @@
         let cardRowsHtml = "";
         deck.cards.forEach((cardId, i) => {
           const cardObj = allCards.find(c => c.cardId === cardId);
+          const isReserve = (deck.format === 'Ark' && i >= 9);
+          const reserveTag = isReserve ? ' <span style="color:#d4af37;">(Reserve)</span>' : '';
           cardRowsHtml += `
             <div class="community-card-row">
-              <span>${i + 1}. ${cardObj ? cardObj.name : cardId}</span>
+              <span>${i + 1}. ${cardObj ? cardObj.name : cardId}${reserveTag}</span>
               <span style="font-weight:600; color:#555;">PWR: ${cardObj ? cardObj.power : '0'}</span>
             </div>
           `;
         });
 
         const isChamp = deck.isChampionship === true;
+        const fmt = deck.format || 'Origin';
+        const badgeClass = fmt === 'Origin' ? 'badge-origin' : 'badge-ark';
         const deckEl = document.createElement('div');
         deckEl.className = `community-deck-card ${isChamp ? 'championship-deck-border' : ''}`;
         
         deckEl.innerHTML = `
           ${isChamp ? '<div class="card-championship-tag" style="top: -12px; left: 16px; bottom: auto;">🏆 Deck Juara Meta</div>' : ''}
-          <div class="community-deck-title" style="${isChamp ? 'margin-top: 10px;' : ''}">${deck.name}</div>
+          <div style="margin-top: ${isChamp ? '14px' : '0'}">
+            <span class="format-badge ${badgeClass}">${fmt} Format</span>
+          </div>
+          <div class="community-deck-title">${deck.name}</div>
           <div class="community-deck-meta">Oleh: <strong>${deck.author}</strong> | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
           <div class="community-deck-note">"${deck.note || '-'}"</div>
           <div class="community-card-preview-list">${cardRowsHtml}</div>
@@ -2294,7 +2395,7 @@
       if (!deck) return;
 
       currentTestDeckObj = deck;
-      document.getElementById('test-modal-title').textContent = `🧪 Uji Deck: ${deck.name}`;
+      document.getElementById('test-modal-title').textContent = `🧪 Uji Deck (${deck.format || 'Origin'}): ${deck.name}`;
       document.getElementById('test-modal-sub').textContent = `Oleh: ${deck.author} | Total Power Deck: ${deck.totalPower}`;
 
       calculateDeckProbabilities(deck);
@@ -2319,7 +2420,7 @@
       }
 
       const hand6 = shuffled.slice(0, 6);
-      const remaining3 = shuffled.slice(6, 9);
+      const remainingCards = shuffled.slice(6);
 
       const simContainer = document.getElementById('sim-hand-container');
       simContainer.innerHTML = "";
@@ -2338,18 +2439,18 @@
 
       document.getElementById('sim-hand-stats').innerHTML = `
         Total Raw Power Hand Awal: <span style="color:var(--primary); font-size:1rem;">${handPower}</span> | 
-        Kartu Tertahan di Deck (3 Kartu): <strong>${remaining3.map(c => c.name).join(', ')}</strong>
+        Sisa Kartu di Pool: <strong>${remainingCards.map(c => c.name).join(', ')}</strong>
       `;
     }
 
     function calculateDeckProbabilities(deck) {
       const fullCards = deck.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
 
-      const expectedPower = ( (6 / 9) * deck.totalPower ).toFixed(1);
+      const expectedPower = ( (6 / fullCards.length) * deck.totalPower ).toFixed(1);
       const powers = fullCards.map(c => parseInt(c.power) || 0).sort((a,b) => a - b);
       
       const minPower = powers.slice(0, 6).reduce((a, b) => a + b, 0);
-      const maxPower = powers.slice(3, 9).reduce((a, b) => a + b, 0);
+      const maxPower = powers.slice(powers.length - 6).reduce((a, b) => a + b, 0);
 
       document.getElementById('stat-expected-power').textContent = expectedPower;
       document.getElementById('stat-min-power').textContent = minPower;
@@ -2368,10 +2469,9 @@
         }
 
         if (count > 0) {
-          const prob = getHypergeometricProbAtLeastOne(count);
           roleBreakdownEl.innerHTML += `
             <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
-              <strong>${role}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
+              <strong>${role}</strong> (${count} kartu)
             </div>
           `;
         }
@@ -2390,27 +2490,19 @@
         }
 
         if (count > 0) {
-          const prob = getHypergeometricProbAtLeastOne(count);
           kwBreakdownEl.innerHTML += `
             <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
-              <strong>${kw}</strong> (${count} kartu): <span class="prob-badge">${prob}% Peluang Draw</span>
+              <strong>${kw}</strong> (${count} kartu)
             </div>
           `;
         }
       });
     }
 
-    function getHypergeometricProbAtLeastOne(K) {
-      if (K >= 4) return "100.0";
-      if (K === 1) return "66.7";
-      if (K === 2) return "91.7";
-      if (K === 3) return "98.8";
-      return "0.0";
-    }
-
     function loadDeckToBuilder(deckId) {
       const target = communityDecks.find(d => d.id === deckId);
       if (!target) return;
+      document.getElementById('deck-format-select').value = target.format || 'Origin';
       document.getElementById('deck-name-input').value = target.name;
       document.getElementById('deck-note-input').value = target.note;
       document.getElementById('deck-username-input').value = target.author !== "Pemain Komunitas" ? target.author : "";
