@@ -435,8 +435,9 @@
 
     .deck-builder-layout {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
       gap: 24px;
+      align-items: start;
     }
 
     .deck-panel {
@@ -445,9 +446,10 @@
       padding: 20px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border-color);
-      height: fit-content;
       position: sticky;
       top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
     }
 
     .deck-header {
@@ -491,7 +493,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 380px;
+      max-height: 280px;
       overflow-y: auto;
       margin-bottom: 16px;
     }
@@ -575,7 +577,7 @@
       font-weight: 700;
       color: #111;
       margin-bottom: 4px;
-      padding-right: 60px; /* space for badge */
+      padding-right: 60px;
     }
 
     .community-deck-meta {
@@ -619,7 +621,7 @@
       border-radius: var(--radius);
       padding: 20px;
       box-shadow: var(--shadow);
-      border: 1px solid #d4af37; /* Gold border to indicate competitive focus */
+      border: 1px solid #d4af37;
       margin-bottom: 30px;
       display: flex;
       gap: 20px;
@@ -819,6 +821,7 @@
 
     .btn-discord { background: #5865F2; }
     .btn-whatsapp { background: #25D366; }
+    .btn-instagram { background: #E1306C; }
 
     .admin-auth-box {
       max-width: 400px;
@@ -943,6 +946,7 @@
       }
       .deck-panel {
         position: static;
+        max-height: none;
       }
       .header-container {
         flex-direction: column;
@@ -1148,7 +1152,7 @@
       
       <div style="text-align: center; margin-bottom: 24px;">
         <h2 style="color: #111; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 8px;">🏆 Analisis Meta Turnamen Kompetitif</h2>
-        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini hanya dianalisis dari deck pemenang turnamen resmi (diunggah oleh Admin).</p>
+        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck pemenang turnamen resmi.</p>
       </div>
 
       <!-- Panel Statistik Meta Deck (Hanya Untuk Deck Kompetitif) -->
@@ -1239,7 +1243,7 @@
       <div class="section-box">
         <h2 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Jadwal Aktif Renathea Camp</h2>
         <div id="schedule-list-box">
-          <div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan admin.</div>
+          <div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan.</div>
         </div>
       </div>
     </div>
@@ -1261,7 +1265,7 @@
               </tr>
             </thead>
             <tbody id="leaderboard-table-body">
-              <tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan oleh admin.</td></tr>
+              <tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1489,16 +1493,20 @@
   <div class="container">
     <div class="contact-banner">
       <h3 style="margin-bottom: 8px;">Ayo Gabung Komunitas Renathea!</h3>
-      <p style="font-size: 0.9rem; margin-bottom: 16px; color: #ddd;">Diskusi meta, cari lawan main, atau daftar Renathea Camp dengan bergabung di server resmi kami.</p>
+      <p style="font-size: 0.9rem; margin-bottom: 16px; color: #ddd;">Diskusi meta, cari lawan main, atau daftar Renathea Camp dengan bergabung di komunitas resmi kami.</p>
       
       <div class="contact-links">
         <a href="https://discord.gg/825jZQ7BQg" target="_blank" class="btn-contact btn-discord">
           <svg width="24" height="24" viewBox="0 0 127.14 96.36" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.73,67.73,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
-          Join Discord
+          Discord
         </a>
         <a href="https://tr.ee/IsOjK25ORG" target="_blank" class="btn-contact btn-whatsapp">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12.031 0C5.394 0 0 5.394 0 12.031c0 2.128.553 4.205 1.603 6.03L.211 24l6.096-1.599A11.968 11.968 0,0,0,12.031 24c6.637 0 12.031-5.394 12.031-12.031C24.062 5.394 18.668 0 12.031 0zm0 22.016a9.92 9.92 0,0,1-5.076-1.392l-.364-.216-3.771.99.998-3.676-.237-.377a9.926 9.926 0,0,1-1.519-5.314c0-5.495 4.47-9.965 9.969-9.965 5.495 0 9.969 4.47 9.969 9.965 0 5.495-4.474 9.965-9.969 9.965zm5.467-7.469c-.3-.151-1.776-.877-2.05-.978-.274-.101-.475-.151-.676.151-.201.302-.776.978-.951 1.179-.176.201-.351.226-.652.075-1.345-.632-2.39-1.39-3.267-2.673-.227-.33-.024-.51.127-.66.136-.135.3-.351.451-.527.151-.176.201-.301.301-.502.1-.201.05-.377-.025-.527-.075-.151-.676-1.631-.926-2.233-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.577-.01-.201 0-.526.075-.801.377-.275.301-1.051 1.028-1.051 2.507 0 1.48 1.076 2.913 1.226 3.114.151.201 2.124 3.242 5.143 4.544.718.309 1.278.493 1.716.632.72.228 1.375.195 1.889.118.577-.086 1.776-.726 2.026-1.429.25-.703.25-1.305.175-1.429-.075-.124-.275-.2-.576-.35z"/></svg>
           Grup WhatsApp
+        </a>
+        <a href="https://www.instagram.com/playrenathea/?hl=en" target="_blank" class="btn-contact btn-instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Instagram
         </a>
       </div>
       <div style="margin-top: 16px; font-size: 0.8rem; color: #888;">
@@ -1669,7 +1677,7 @@
     let leaderboardData = [];
     let isAdminLoggedIn = false;
     let currentTestDeckObj = null;
-    let activeDeckFilter = 'all'; // 'all', 'championship', 'community'
+    let activeDeckFilter = 'all';
 
     // REAL-TIME CLOUD LISTENERS
     function listenToCommunityDecks() {
@@ -1945,15 +1953,11 @@
       });
     }
 
-    // FUNGSI EXPORT/IMPORT DECK KODE
-    // Kode di-generate menggunakan format singkat: misal RCS-001,RCS-002, tanpa class/standard
     function getShortCodeFromId(cardId) {
-      // Ambil bagian sebelum "|" dan hilangkan spasi
       return cardId.split('|')[0].replace(/\s+/g, '');
     }
 
     function getFullIdFromShortCode(shortCode) {
-      // Coba cari kecocokan di database
       const card = allCards.find(c => {
          const cShort = c.cardId.split('|')[0].replace(/\s+/g, '');
          return cShort === shortCode;
@@ -1969,9 +1973,8 @@
       
       const shortCodes = userDeck.map(c => getShortCodeFromId(c.cardId));
       const idString = shortCodes.join(',');
-      const base64Code = btoa(idString); // Encode ke Base64
+      const base64Code = btoa(idString);
 
-      // Tampilkan ke input atau otomatis copy
       const deckCodeInput = document.getElementById('deck-code-input');
       deckCodeInput.value = base64Code;
       
@@ -1990,21 +1993,19 @@
       }
 
       try {
-        const idString = atob(base64Code); // Decode dari Base64
+        const idString = atob(base64Code);
         const shortCodes = idString.split(',');
 
         if (shortCodes.length !== 9) {
           throw new Error("Jumlah kartu tidak valid");
         }
 
-        // Cek apakah semua ID ada di database
         const importedCards = [];
         for (let i = 0; i < shortCodes.length; i++) {
           const shortCode = shortCodes[i];
           const fullId = getFullIdFromShortCode(shortCode);
           
           if (!fullId) {
-             // Fallback mencoba cari ID full langsung (untuk backward compatibility kode lama)
              const fallbackCard = allCards.find(c => c.cardId === shortCode);
              if(fallbackCard) {
                 importedCards.push(fallbackCard);
@@ -2017,7 +2018,6 @@
           importedCards.push(allCards.find(c => c.cardId === fullId));
         }
 
-        // Cek validitas Class ID duplikat
         const classIds = new Set();
         for (let c of importedCards) {
           if (c.classId && c.classId !== "-") {
@@ -2031,7 +2031,7 @@
 
         userDeck = importedCards;
         renderDeckUI();
-        document.getElementById('deck-code-input').value = ""; // Clear input
+        document.getElementById('deck-code-input').value = "";
         alert("✅ Deck berhasil di-import!");
 
       } catch (e) {
@@ -2054,7 +2054,6 @@
       });
     }
 
-
     function publishDeckToCommunity() {
       const deckName = document.getElementById('deck-name-input').value.trim() || "Deck Tanpa Nama";
       const deckNote = document.getElementById('deck-note-input').value.trim();
@@ -2071,7 +2070,7 @@
         author: username,
         cards: userDeck.map(c => c.cardId),
         totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
-        isChampionship: false, // FLAG BARU: Untuk membedakan deck turnamen dan publik
+        isChampionship: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -2087,7 +2086,6 @@
         });
     }
 
-    // Fungsi Admin untuk Upload Deck Juara
     function submitChampionshipDeck() {
        const eventName = document.getElementById('admin-champ-event').value.trim();
        const playerName = document.getElementById('admin-champ-player').value.trim();
@@ -2119,7 +2117,6 @@
           return;
        }
        
-       // Hitung total power
        let totalPwr = 0;
        importedCardsIds.forEach(id => {
           const c = allCards.find(cd => cd.cardId === id);
@@ -2132,7 +2129,7 @@
         author: playerName,
         cards: importedCardsIds,
         totalPower: totalPwr,
-        isChampionship: true, // FLAG CHAMPIONSHIP
+        isChampionship: true,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -2151,7 +2148,6 @@
     }
 
     function calculateMetaStats() {
-      // HANYA AMBIL DECK TURNAMEN (isChampionship === true)
       const champDecks = communityDecks.filter(d => d.isChampionship === true);
       
       if (champDecks.length === 0) {
@@ -2171,15 +2167,12 @@
           totalCardsAnalyzed++;
           const cardObj = allCards.find(c => c.cardId === cardId);
           if (cardObj) {
-            // Hitung Kartu
             cardCountMap[cardObj.name] = (cardCountMap[cardObj.name] || 0) + 1;
 
-            // Hitung Set
             if (cardObj.set && cardObj.set !== "-") {
               setCountMap[cardObj.set] = (setCountMap[cardObj.set] || 0) + 1;
             }
 
-            // Hitung Role
             let roles = (cardObj.role || "No Role").split('|').map(r => r.trim());
             if (roles.length === 0 || roles[0] === "" || roles[0] === "-") roles = ["No Role"];
             
@@ -2190,11 +2183,10 @@
         });
       });
 
-      // --- Render Top Kartu ---
       const sortedCards = Object.entries(cardCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
       let topCardsHtml = "";
       sortedCards.forEach((item, index) => {
-        const percent = ((item[1] / champDecks.length) * 100).toFixed(1); // % kemunculan di deck juara
+        const percent = ((item[1] / champDecks.length) * 100).toFixed(1);
         topCardsHtml += `
           <div class="meta-list-item">
             <span><strong>#${index + 1}</strong> ${item[0]}</span>
@@ -2204,7 +2196,6 @@
       });
       document.getElementById('meta-top-cards').innerHTML = topCardsHtml;
 
-      // --- Render Top Roles ---
       const sortedRoles = Object.entries(roleCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
       let topRolesHtml = "";
       sortedRoles.forEach((item, index) => {
@@ -2218,7 +2209,6 @@
       });
       document.getElementById('meta-top-roles').innerHTML = topRolesHtml;
 
-      // --- Render Top Sets ---
       const sortedSets = Object.entries(setCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
       let topSetsHtml = "";
       sortedSets.forEach((item, index) => {
@@ -2236,7 +2226,6 @@
     function setDeckFilter(filterType) {
        activeDeckFilter = filterType;
        
-       // Update style tombol
        document.getElementById('filter-all-decks').style.background = filterType === 'all' ? 'var(--primary)' : '#e0e0e0';
        document.getElementById('filter-all-decks').style.color = filterType === 'all' ? '#fff' : 'var(--text-main)';
        
@@ -2250,13 +2239,11 @@
     }
 
     function renderCommunityDecks() {
-      // Panggil kalkulasi meta (Hanya dari deck juara)
       calculateMetaStats();
 
       const grid = document.getElementById('community-deck-grid');
       grid.innerHTML = "";
       
-      // Filter list berdasarkan tombol yang aktif
       let displayDecks = communityDecks;
       if (activeDeckFilter === 'championship') {
          displayDecks = communityDecks.filter(d => d.isChampionship === true);
@@ -2302,7 +2289,6 @@
       });
     }
 
-    // FUNGSI UJI DECK & ANALISIS PROBABILITAS
     function openTestDeckModal(deckId) {
       const deck = communityDecks.find(d => d.id === deckId);
       if (!deck) return;
@@ -2311,10 +2297,7 @@
       document.getElementById('test-modal-title').textContent = `🧪 Uji Deck: ${deck.name}`;
       document.getElementById('test-modal-sub').textContent = `Oleh: ${deck.author} | Total Power Deck: ${deck.totalPower}`;
 
-      // Hitung Analisis Statis Matematika
       calculateDeckProbabilities(deck);
-
-      // Jalankan Simulasi Draw Hand Pertama
       reshuffleTestHand();
 
       document.getElementById('deck-test-modal').classList.add('active');
@@ -2329,7 +2312,6 @@
 
       const deckCards = currentTestDeckObj.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
       
-      // Shuffle Fisher-Yates
       const shuffled = [...deckCards];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -2360,15 +2342,12 @@
       `;
     }
 
-    // HITUNG KALKULASI PELUANG HIPERGEOMETRIK
     function calculateDeckProbabilities(deck) {
       const fullCards = deck.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
 
-      // 1. Statis Power
       const expectedPower = ( (6 / 9) * deck.totalPower ).toFixed(1);
       const powers = fullCards.map(c => parseInt(c.power) || 0).sort((a,b) => a - b);
       
-      // Min 6 power & Max 6 power
       const minPower = powers.slice(0, 6).reduce((a, b) => a + b, 0);
       const maxPower = powers.slice(3, 9).reduce((a, b) => a + b, 0);
 
@@ -2376,7 +2355,6 @@
       document.getElementById('stat-min-power').textContent = minPower;
       document.getElementById('stat-max-power').textContent = maxPower;
 
-      // 2. Peluang Kombinasi Role (Peluang minimal ditarik 1 kartu role tersebut di 6 draw awal)
       const rolesList = ['Tank', 'Melee', 'Agility', 'Ranged', 'Magic', 'Support', 'No Role'];
       const roleBreakdownEl = document.getElementById('stat-role-breakdown');
       roleBreakdownEl.innerHTML = "";
@@ -2399,7 +2377,6 @@
         }
       });
 
-      // 3. Peluang Kombinasi Keyword / Skill
       const keywordsList = ['Powerup', 'Silence', 'Protect', 'Law', 'Copy', 'Passive', 'No Skill'];
       const kwBreakdownEl = document.getElementById('stat-keyword-breakdown');
       kwBreakdownEl.innerHTML = "";
@@ -2423,12 +2400,11 @@
       });
     }
 
-    // Matematika hipergeometrik: Peluang ditarik MINIMAL 1 dari K kartu sukses dalam 9 kartu ketika mengambil 6 kartu
     function getHypergeometricProbAtLeastOne(K) {
-      if (K >= 4) return "100.0"; // Jika dalam 9 kartu ada 4+ kartu target, dan kita ambil 6, pasti terambil min 1.
-      if (K === 1) return "66.7"; // (8C6 / 9C6) = 28/84 = 1/3 fail -> 66.67% success
-      if (K === 2) return "91.7"; // (7C6 / 9C6) = 7/84 fail -> 91.67% success
-      if (K === 3) return "98.8"; // (6C6 / 9C6) = 1/84 fail -> 98.81% success
+      if (K >= 4) return "100.0";
+      if (K === 1) return "66.7";
+      if (K === 2) return "91.7";
+      if (K === 3) return "98.8";
       return "0.0";
     }
 
@@ -2451,7 +2427,6 @@
       }
     }
 
-    // CAMP DIRECTORY LOGIC
     function submitCampDirectory() {
       const name = document.getElementById('dir-name-input').value.trim();
       const captain = document.getElementById('dir-captain-input').value.trim();
@@ -2513,7 +2488,6 @@
       }
     }
 
-    // CAMP SCHEDULE LOGIC
     function submitCampSchedule() {
       const type = document.getElementById('camp-type-input').value;
       const title = document.getElementById('camp-title-input').value.trim();
@@ -2545,7 +2519,7 @@
       listBox.innerHTML = "";
 
       if (campSchedules.length === 0) {
-        listBox.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan admin.</div>`;
+        listBox.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan.</div>`;
         return;
       }
 
@@ -2574,7 +2548,6 @@
       }
     }
 
-    // LEADERBOARD LOGIC
     function submitLeaderboardEntry() {
       const name = document.getElementById('lb-name-input').value.trim();
       const camp = document.getElementById('lb-camp-input').value.trim();
@@ -2605,7 +2578,7 @@
       tbody.innerHTML = "";
 
       if (leaderboardData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan oleh admin.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan.</td></tr>`;
         return;
       }
 
@@ -2631,7 +2604,6 @@
       }
     }
 
-    // ADMIN DASHBOARD LOGIC
     function checkAdminAuthStatus() {
       const loginBox = document.getElementById('admin-login-box');
       const dashBox = document.getElementById('admin-dashboard-box');
