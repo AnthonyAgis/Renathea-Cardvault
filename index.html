@@ -458,6 +458,18 @@
       margin-bottom: 16px;
     }
 
+    .format-info-card {
+      background: #f8f9fa;
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #444;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
     .deck-input {
       width: 100%;
       padding: 10px;
@@ -493,7 +505,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 280px;
+      max-height: 320px;
       overflow-y: auto;
       margin-bottom: 16px;
     }
@@ -1071,6 +1083,11 @@
             <option value="Ark">Ark Format (Max 12 Kartu / 9 Main + 3 Reserve)</option>
           </select>
 
+          <!-- PENJELASAN INTERAKTIF FORMAT PERTANDINGAN -->
+          <div class="format-info-card" id="format-info-box">
+            <strong>⚔️ Origin Format:</strong> Wajib 9 kartu karakter dengan Class ID unik. Kartu langsung digunakan bertanding di arena.
+          </div>
+
           <label style="font-size:0.8rem; font-weight:600; color:#555;">NICKNAME / USERNAME (OPSIONAL)</label>
           <input type="text" id="deck-username-input" class="deck-input" placeholder="Masukkan Nickname Anda..." value="" />
 
@@ -1170,7 +1187,7 @@
       
       <div style="text-align: center; margin-bottom: 24px;">
         <h2 style="color: #111; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 8px;">🏆 Analisis Meta Turnamen Kompetitif</h2>
-        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck pemenang turnamen resmi.</p>
+        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck pemenang turnamen resmi <span id="meta-format-subtitle" style="font-weight:bold; color:var(--primary);">(Semua Format)</span>.</p>
       </div>
 
       <!-- Panel Statistik Meta Deck -->
@@ -1245,7 +1262,7 @@
             <li>Pemenang diabadikan menjadi kartu promo/eksklusif pada *Convergence Series* berikutnya beserta fisik kartunya.</li>
           </ul>
         </div>
-        <div class="camp-card" style="grid-column: 1 / -1; border-top-color: #d4af37;">
+        <div class="camp-card" style="border-top-color: #d4af37;">
           <h3>⛺ Jambore Nasional</h3>
           <ul>
             <li>Acara puncak Renathea yang diadakan di akhir Season, terbuka untuk semua Camp dan seluruh komunitas Renathea.</li>
@@ -1348,6 +1365,7 @@
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">🏕️ Tambah / Kelola Renathea Camp Resmi</h3>
+          <input type="hidden" id="dir-edit-id" value="">
           <div class="search-row" style="margin-bottom: 10px;">
             <div class="admin-form-group" style="flex: 1;">
               <label>Nama Camp</label>
@@ -1372,11 +1390,15 @@
             <label>Link Komunitas (WhatsApp / Discord / Maps URL)</label>
             <input type="text" id="dir-link-input" placeholder="https://chat.whatsapp.com/xxx">
           </div>
-          <button class="btn btn-primary" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori Cloud</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" id="dir-submit-btn" style="flex:1;" onclick="submitCampDirectory()">➕ Tambahkan Camp ke Direktori Cloud</button>
+            <button class="btn btn-secondary" onclick="resetCampDirectoryForm()">Batal</button>
+          </div>
         </div>
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">📅 Publikasikan Jadwal Renathea Camp</h3>
+          <input type="hidden" id="camp-edit-id" value="">
           <div class="search-row" style="margin-bottom: 10px;">
             <div class="admin-form-group" style="flex: 1;">
               <label>Tipe Kompetisi</label>
@@ -1400,10 +1422,13 @@
             </div>
           </div>
           <div class="admin-form-group" style="margin-bottom: 14px;">
-            <label>Catatan / Keterangan Tambahan</label>
-            <textarea id="camp-desc-input" class="deck-textarea" placeholder="Tuliskan detail tempat, link Discord, atau syarat khusus..."></textarea>
+            <label>Catatan / Keterangan Tambahan (Link otomatis aktif)</label>
+            <textarea id="camp-desc-input" class="deck-textarea" placeholder="Tuliskan detail tempat, link Discord https://..., atau syarat khusus..."></textarea>
           </div>
-          <button class="btn btn-primary" onclick="submitCampSchedule()">📢 Publikasikan Jadwal ke Cloud</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" id="camp-submit-btn" style="flex:1;" onclick="submitCampSchedule()">📢 Publikasikan Jadwal ke Cloud</button>
+            <button class="btn btn-secondary" onclick="resetCampScheduleForm()">Batal</button>
+          </div>
         </div>
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
@@ -1710,7 +1735,7 @@
     let isAdminLoggedIn = false;
     let currentTestDeckObj = null;
     let activeDeckFilter = 'all';
-    let activeFormatFilter = 'all'; // 'all', 'Origin', 'Ark'
+    let activeFormatFilter = 'all';
 
     // REAL-TIME CLOUD LISTENERS
     function listenToCommunityDecks() {
@@ -1722,7 +1747,7 @@
             const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID');
             communityDecks.push({
               id: doc.id,
-              format: data.format || 'Origin', // Fallback default
+              format: data.format || 'Origin',
               ...data,
               updatedAt: dateStr
             });
@@ -1759,6 +1784,14 @@
           });
           renderLeaderboardTable();
         }, (error) => console.error("Gagal membaca leaderboard:", error));
+    }
+
+    function autoLinkify(text) {
+      if (!text) return '-';
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      return text.replace(urlRegex, function(url) {
+        return `<a href="${url}" target="_blank" style="color:var(--primary); font-weight:600; text-decoration:underline;">${url}</a>`;
+      });
     }
 
     function formatSkillText(skillText) {
@@ -1930,10 +1963,15 @@
 
     function onFormatChange() {
       const format = document.getElementById('deck-format-select').value;
-      const maxLimit = format === 'Origin' ? 9 : 12;
-      if (userDeck.length > maxLimit) {
-        userDeck = userDeck.slice(0, maxLimit);
-        alert(`⚠️ Format diubah ke ${format}. Deck dipotong menjadi maksimal ${maxLimit} kartu.`);
+      const infoBox = document.getElementById('format-info-box');
+      if (format === 'Origin') {
+        infoBox.innerHTML = `<strong>⚔️ Origin Format:</strong> Wajib 9 kartu karakter dengan Class ID unik. Langsung bertanding di arena tanpa reserve.`;
+        if (userDeck.length > 9) {
+          userDeck = userDeck.slice(0, 9);
+          alert(`⚠️ Format diubah ke Origin. Deck disesuaikan menjadi 9 kartu utama.`);
+        }
+      } else {
+        infoBox.innerHTML = `<strong>🛡️ Ark Format:</strong> Bawa 12 kartu (9 Main Deck + 3 Reserve) dengan Class ID unik di seluruh kartu. Open decklist & dapat tukar reserve saat match.`;
       }
       renderDeckUI();
     }
@@ -1964,6 +2002,19 @@
 
     function removeCardFromDeck(index) {
       userDeck.splice(index, 1);
+      renderDeckUI();
+    }
+
+    function moveCardToReserve(index) {
+      if (userDeck.length <= 9) return;
+      const card = userDeck.splice(index, 1)[0];
+      userDeck.push(card);
+      renderDeckUI();
+    }
+
+    function moveCardToMain(index) {
+      const card = userDeck.splice(index, 1)[0];
+      userDeck.splice(8, 0, card);
       renderDeckUI();
     }
 
@@ -1998,19 +2049,76 @@
       }
 
       listContainer.innerHTML = "";
-      userDeck.forEach((card, idx) => {
-        const item = document.createElement('div');
-        item.className = 'deck-card-item';
-        const labelReserve = (format === 'Ark' && idx >= 9) ? ' <span style="color:#d4af37; font-weight:bold;">(Reserve)</span>' : '';
-        item.innerHTML = `
-          <div class="deck-card-info">
-            <span class="deck-card-name">${idx + 1}. ${card.name}${labelReserve}</span>
-            <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
-          </div>
-          <button class="btn-remove-card" onclick="removeCardFromDeck(${idx})">&times;</button>
-        `;
-        listContainer.appendChild(item);
-      });
+
+      if (format === 'Origin') {
+        userDeck.forEach((card, idx) => {
+          const item = document.createElement('div');
+          item.className = 'deck-card-item';
+          item.innerHTML = `
+            <div class="deck-card-info">
+              <span class="deck-card-name">${idx + 1}. ${card.name}</span>
+              <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
+            </div>
+            <button class="btn-remove-card" onclick="removeCardFromDeck(${idx})">&times;</button>
+          `;
+          listContainer.appendChild(item);
+        });
+      } else {
+        const mainCards = userDeck.slice(0, 9);
+        const reserveCards = userDeck.slice(9, 12);
+
+        const mainHeader = document.createElement('div');
+        mainHeader.style.cssText = 'font-weight:700; font-size:0.8rem; color:#111; margin-top:4px; margin-bottom:4px; padding-bottom:2px; border-bottom:1px solid #ccc;';
+        mainHeader.textContent = `⚔️ MAIN DECK (${mainCards.length}/9)`;
+        listContainer.appendChild(mainHeader);
+
+        mainCards.forEach((card, idx) => {
+          const item = document.createElement('div');
+          item.className = 'deck-card-item';
+          item.innerHTML = `
+            <div class="deck-card-info">
+              <span class="deck-card-name">${idx + 1}. ${card.name}</span>
+              <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
+            </div>
+            <div style="display:flex; gap:4px; align-items:center;">
+              ${userDeck.length > 9 ? `<button title="Pindahkan ke Reserve Pool" style="background:#f0a500; color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; cursor:pointer;" onclick="moveCardToReserve(${idx})">⬇️ Reserve</button>` : ''}
+              <button class="btn-remove-card" onclick="removeCardFromDeck(${idx})">&times;</button>
+            </div>
+          `;
+          listContainer.appendChild(item);
+        });
+
+        const resHeader = document.createElement('div');
+        resHeader.style.cssText = 'font-weight:700; font-size:0.8rem; color:#b25900; margin-top:12px; margin-bottom:4px; padding-bottom:2px; border-bottom:1px solid #ffe599;';
+        resHeader.textContent = `🛡️ RESERVE POOL (${reserveCards.length}/3)`;
+        listContainer.appendChild(resHeader);
+
+        if (reserveCards.length === 0) {
+          const emptyRes = document.createElement('div');
+          emptyRes.style.cssText = 'font-size:0.78rem; color:#888; padding:4px 0;';
+          emptyRes.textContent = 'Belum ada kartu reserve (kartu ke 10-12 otomatis masuk ke sini).';
+          listContainer.appendChild(emptyRes);
+        }
+
+        reserveCards.forEach((card, rIdx) => {
+          const realIdx = 9 + rIdx;
+          const item = document.createElement('div');
+          item.className = 'deck-card-item';
+          item.style.background = '#fffdf5';
+          item.style.borderColor = '#ffe599';
+          item.innerHTML = `
+            <div class="deck-card-info">
+              <span class="deck-card-name">${rIdx + 1}. ${card.name}</span>
+              <span class="deck-card-sub">${card.classId || '-'} | PWR: ${card.power}</span>
+            </div>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <button title="Pindahkan ke Main Deck" style="background:#28a745; color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; cursor:pointer;" onclick="moveCardToMain(${realIdx})">⬆️ Main</button>
+              <button class="btn-remove-card" onclick="removeCardFromDeck(${realIdx})">&times;</button>
+            </div>
+          `;
+          listContainer.appendChild(item);
+        });
+      }
     }
 
     function getShortCodeFromId(cardId) {
@@ -2065,6 +2173,7 @@
 
         const formatDetected = shortCodes.length === 12 ? 'Ark' : 'Origin';
         document.getElementById('deck-format-select').value = formatDetected;
+        onFormatChange();
 
         const importedCards = [];
         for (let i = 0; i < shortCodes.length; i++) {
@@ -2220,12 +2329,24 @@
     }
 
     function calculateMetaStats() {
-      const champDecks = communityDecks.filter(d => d.isChampionship === true);
+      let champDecks = communityDecks.filter(d => d.isChampionship === true);
       
+      // Filter Analisis Meta berdasarkan Format Pilihan
+      if (activeFormatFilter !== 'all') {
+         champDecks = champDecks.filter(d => d.format === activeFormatFilter);
+      }
+
+      const subtitleEl = document.getElementById('meta-format-subtitle');
+      if (subtitleEl) {
+        subtitleEl.textContent = activeFormatFilter === 'all' 
+          ? '(Semua Format)' 
+          : `(${activeFormatFilter} Format)`;
+      }
+
       if (champDecks.length === 0) {
-        document.getElementById('meta-top-cards').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
-        document.getElementById('meta-top-roles').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
-        document.getElementById('meta-top-sets').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
+        document.getElementById('meta-top-cards').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen untuk format ini</div>";
+        document.getElementById('meta-top-roles').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen untuk format ini</div>";
+        document.getElementById('meta-top-sets').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen untuk format ini</div>";
         return;
       }
 
@@ -2333,12 +2454,10 @@
       
       let displayDecks = communityDecks;
 
-      // Filter Format
       if (activeFormatFilter !== 'all') {
          displayDecks = displayDecks.filter(d => d.format === activeFormatFilter);
       }
 
-      // Filter Tipe (Champ vs Comm)
       if (activeDeckFilter === 'championship') {
          displayDecks = displayDecks.filter(d => d.isChampionship === true);
       } else if (activeDeckFilter === 'community') {
@@ -2355,7 +2474,7 @@
         deck.cards.forEach((cardId, i) => {
           const cardObj = allCards.find(c => c.cardId === cardId);
           const isReserve = (deck.format === 'Ark' && i >= 9);
-          const reserveTag = isReserve ? ' <span style="color:#d4af37;">(Reserve)</span>' : '';
+          const reserveTag = isReserve ? ' <span style="color:#d4af37; font-weight:bold;">(Reserve)</span>' : '';
           cardRowsHtml += `
             <div class="community-card-row">
               <span>${i + 1}. ${cardObj ? cardObj.name : cardId}${reserveTag}</span>
@@ -2503,6 +2622,7 @@
       const target = communityDecks.find(d => d.id === deckId);
       if (!target) return;
       document.getElementById('deck-format-select').value = target.format || 'Origin';
+      onFormatChange();
       document.getElementById('deck-name-input').value = target.name;
       document.getElementById('deck-note-input').value = target.note;
       document.getElementById('deck-username-input').value = target.author !== "Pemain Komunitas" ? target.author : "";
@@ -2519,7 +2639,32 @@
       }
     }
 
+    function editCampDirectory(id) {
+      const item = campDirectories.find(c => c.id === id);
+      if (!item) return;
+      document.getElementById('dir-edit-id').value = id;
+      document.getElementById('dir-name-input').value = item.name || '';
+      document.getElementById('dir-captain-input').value = item.captain || '';
+      document.getElementById('dir-location-input').value = item.location || '';
+      document.getElementById('dir-schedule-input').value = item.schedule || '';
+      document.getElementById('dir-link-input').value = item.link || '';
+      document.getElementById('dir-submit-btn').textContent = "💾 Update Data Camp";
+      switchMainTab('admin-tab');
+      document.getElementById('dir-name-input').focus();
+    }
+
+    function resetCampDirectoryForm() {
+      document.getElementById('dir-edit-id').value = "";
+      document.getElementById('dir-name-input').value = "";
+      document.getElementById('dir-captain-input').value = "";
+      document.getElementById('dir-location-input').value = "";
+      document.getElementById('dir-schedule-input').value = "";
+      document.getElementById('dir-link-input').value = "";
+      document.getElementById('dir-submit-btn').textContent = "➕ Tambahkan Camp ke Direktori Cloud";
+    }
+
     function submitCampDirectory() {
+      const editId = document.getElementById('dir-edit-id').value;
       const name = document.getElementById('dir-name-input').value.trim();
       const captain = document.getElementById('dir-captain-input').value.trim();
       const location = document.getElementById('dir-location-input').value.trim();
@@ -2531,21 +2676,27 @@
         return;
       }
 
-      const newDir = {
+      const dirData = {
         name, captain, location, schedule, link,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      db.collection("camp_directories").add(newDir)
-        .then(() => {
-          alert("✅ Renathea Camp berhasil ditambahkan ke Cloud!");
-          document.getElementById('dir-name-input').value = "";
-          document.getElementById('dir-captain-input').value = "";
-          document.getElementById('dir-location-input').value = "";
-          document.getElementById('dir-schedule-input').value = "";
-          document.getElementById('dir-link-input').value = "";
-        })
-        .catch(err => alert("❌ Gagal menyimpan: " + err.message));
+      if (editId) {
+        db.collection("camp_directories").doc(editId).update(dirData)
+          .then(() => {
+            alert("✅ Data Renathea Camp berhasil diperbarui!");
+            resetCampDirectoryForm();
+          })
+          .catch(err => alert("❌ Gagal memperbarui: " + err.message));
+      } else {
+        dirData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection("camp_directories").add(dirData)
+          .then(() => {
+            alert("✅ Renathea Camp berhasil ditambahkan ke Cloud!");
+            resetCampDirectoryForm();
+          })
+          .catch(err => alert("❌ Gagal menyimpan: " + err.message));
+      }
     }
 
     function renderCampDirectories() {
@@ -2566,7 +2717,12 @@
           <div class="camp-directory-meta">📍 <strong>Lokasi:</strong> ${item.location || '-'}</div>
           <div class="camp-directory-meta" style="margin-bottom: 12px;">🕒 <strong>Jadwal:</strong> ${item.schedule || '-'}</div>
           ${item.link ? `<a href="${item.link}" target="_blank" class="camp-link-btn">🔗 Gabung Komunitas Camp</a>` : ''}
-          ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size: 0.75rem; padding: 4px; margin-top: 8px;" onclick="deleteCampDirectory('${item.id}')">Hapus Camp</button>` : ''}
+          ${isAdminLoggedIn ? `
+            <div style="display:flex; gap:6px; margin-top:8px;">
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px; flex:1;" onclick="editCampDirectory('${item.id}')">✏️ Edit Camp</button>
+              <button class="btn btn-danger" style="font-size: 0.75rem; padding: 4px; flex:1;" onclick="deleteCampDirectory('${item.id}')">🗑️ Hapus</button>
+            </div>
+          ` : ''}
         `;
         grid.appendChild(card);
       });
@@ -2580,7 +2736,29 @@
       }
     }
 
+    function editCampSchedule(id) {
+      const item = campSchedules.find(s => s.id === id);
+      if (!item) return;
+      document.getElementById('camp-edit-id').value = id;
+      document.getElementById('camp-type-input').value = item.type || 'OnCamp';
+      document.getElementById('camp-title-input').value = item.title || '';
+      document.getElementById('camp-time-input').value = item.time || '';
+      document.getElementById('camp-desc-input').value = item.desc || '';
+      document.getElementById('camp-submit-btn').textContent = "💾 Update Jadwal";
+      switchMainTab('admin-tab');
+      document.getElementById('camp-title-input').focus();
+    }
+
+    function resetCampScheduleForm() {
+      document.getElementById('camp-edit-id').value = "";
+      document.getElementById('camp-title-input').value = "";
+      document.getElementById('camp-time-input').value = "";
+      document.getElementById('camp-desc-input').value = "";
+      document.getElementById('camp-submit-btn').textContent = "📢 Publikasikan Jadwal ke Cloud";
+    }
+
     function submitCampSchedule() {
+      const editId = document.getElementById('camp-edit-id').value;
       const type = document.getElementById('camp-type-input').value;
       const title = document.getElementById('camp-title-input').value.trim();
       const time = document.getElementById('camp-time-input').value.trim();
@@ -2591,19 +2769,27 @@
         return;
       }
 
-      const newSchedule = {
+      const schedData = {
         type, title, time, desc,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      db.collection("camp_schedules").add(newSchedule)
-        .then(() => {
-          alert("📢 Jadwal Renathea Camp berhasil dipublikasikan ke Cloud!");
-          document.getElementById('camp-title-input').value = "";
-          document.getElementById('camp-time-input').value = "";
-          document.getElementById('camp-desc-input').value = "";
-        })
-        .catch(err => alert("❌ Gagal mempublikasikan: " + err.message));
+      if (editId) {
+        db.collection("camp_schedules").doc(editId).update(schedData)
+          .then(() => {
+            alert("📢 Jadwal Renathea Camp berhasil diperbarui!");
+            resetCampScheduleForm();
+          })
+          .catch(err => alert("❌ Gagal memperbarui: " + err.message));
+      } else {
+        schedData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection("camp_schedules").add(schedData)
+          .then(() => {
+            alert("📢 Jadwal Renathea Camp berhasil dipublikasikan ke Cloud!");
+            resetCampScheduleForm();
+          })
+          .catch(err => alert("❌ Gagal mempublikasikan: " + err.message));
+      }
     }
 
     function renderCampSchedules() {
@@ -2624,9 +2810,14 @@
             <span style="background: ${badgeColor}; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">${item.type}</span>
             <h4 style="margin-top: 6px; font-size: 1.05rem; color: #111;">${item.title}</h4>
             <p style="font-size: 0.85rem; color: #555; margin-top: 2px;">🕒 ${item.time}</p>
-            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 6px; border-radius: 4px;">${item.desc}</p>` : ''}
+            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 6px; border-radius: 4px;">${autoLinkify(item.desc)}</p>` : ''}
           </div>
-          ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size: 0.8rem; padding: 4px 10px;" onclick="deleteCampSchedule('${item.id}')">Hapus</button>` : ''}
+          ${isAdminLoggedIn ? `
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px;" onclick="editCampSchedule('${item.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" style="font-size: 0.8rem; padding: 4px 10px;" onclick="deleteCampSchedule('${item.id}')">🗑️ Hapus</button>
+            </div>
+          ` : ''}
         `;
         listBox.appendChild(row);
       });
