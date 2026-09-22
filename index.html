@@ -363,6 +363,20 @@
       font-weight: 600;
       text-transform: uppercase;
     }
+    
+    .card-championship-tag {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: #d4af37;
+      color: #000;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
 
     .card-body {
       padding: 14px;
@@ -549,6 +563,11 @@
       border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
+      position: relative;
+    }
+    
+    .championship-deck-border {
+      border: 2px solid #d4af37;
     }
 
     .community-deck-title {
@@ -556,6 +575,7 @@
       font-weight: 700;
       color: #111;
       margin-bottom: 4px;
+      padding-right: 60px; /* space for badge */
     }
 
     .community-deck-meta {
@@ -599,7 +619,7 @@
       border-radius: var(--radius);
       padding: 20px;
       box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
+      border: 1px solid #d4af37; /* Gold border to indicate competitive focus */
       margin-bottom: 30px;
       display: flex;
       gap: 20px;
@@ -620,7 +640,7 @@
       font-weight: 700;
       color: #111;
       margin-bottom: 12px;
-      border-bottom: 2px solid var(--primary);
+      border-bottom: 2px solid #d4af37;
       padding-bottom: 6px;
     }
     
@@ -766,21 +786,39 @@
       background: #1a1a1a;
       color: #fff;
       text-align: center;
-      padding: 16px;
+      padding: 24px 16px;
       border-radius: var(--radius);
       margin-top: 30px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      border-bottom: 4px solid var(--primary);
     }
 
-    .contact-banner a {
-      color: var(--primary);
-      font-weight: bold;
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-contact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 30px;
       text-decoration: none;
+      font-weight: bold;
+      color: #fff;
+      transition: opacity 0.2s;
+    }
+    
+    .btn-contact:hover {
+      opacity: 0.85;
     }
 
-    .contact-banner a:hover {
-      text-decoration: underline;
-    }
+    .btn-discord { background: #5865F2; }
+    .btn-whatsapp { background: #25D366; }
 
     .admin-auth-box {
       max-width: 400px;
@@ -1108,14 +1146,19 @@
     <!-- TAB 3: COMMUNITY DECKS & META -->
     <div id="community-tab" class="tab-content">
       
-      <!-- Panel Statistik Meta Deck -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="color: #111; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 8px;">🏆 Analisis Meta Turnamen Kompetitif</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini hanya dianalisis dari deck pemenang turnamen resmi (diunggah oleh Admin).</p>
+      </div>
+
+      <!-- Panel Statistik Meta Deck (Hanya Untuk Deck Kompetitif) -->
       <div class="meta-stats-panel" id="meta-stats-panel">
         <div class="meta-stat-box">
-          <div class="meta-stat-title">🔥 Top 5 Kartu Paling Digunakan</div>
+          <div class="meta-stat-title">🔥 Top 5 Kartu Meta</div>
           <div id="meta-top-cards">Memuat data...</div>
         </div>
         <div class="meta-stat-box">
-          <div class="meta-stat-title">⚔️ Dominasi Role Komunitas</div>
+          <div class="meta-stat-title">⚔️ Dominasi Role</div>
           <div id="meta-top-roles">Memuat data...</div>
         </div>
         <div class="meta-stat-box">
@@ -1124,9 +1167,16 @@
         </div>
       </div>
 
-      <div class="results-info">Daftar Deck Racikan Komunitas Pemain (Global Real-time)</div>
+      <!-- Filter Deck List -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center;">
+        <span style="font-weight: 600; font-size: 0.9rem;">Tampilkan Deck:</span>
+        <button class="btn btn-secondary" id="filter-all-decks" onclick="setDeckFilter('all')" style="background:var(--primary); color:#fff;">Semua Deck</button>
+        <button class="btn btn-secondary" id="filter-champ-decks" onclick="setDeckFilter('championship')">🏆 Juara Turnamen</button>
+        <button class="btn btn-secondary" id="filter-comm-decks" onclick="setDeckFilter('community')">👥 Komunitas Publik</button>
+      </div>
+
       <div class="community-grid" id="community-deck-grid">
-        <div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck komunitas yang dipublikasikan.</div>
+        <div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck yang dipublikasikan.</div>
       </div>
     </div>
 
@@ -1232,6 +1282,32 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h2>Panel Pengelola Admin</h2>
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
+        </div>
+        
+        <!-- ADMIN: PUBLIKASI DECK JUARA -->
+        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #d4af37; background: #fffdf5;">
+          <h3 style="margin-bottom: 14px; color: #8a7300;">🏆 Publikasikan Deck Juara Turnamen (Masuk Meta)</h3>
+          <p style="font-size: 0.85rem; color: #555; margin-bottom: 12px;">Deck yang diunggah melalui panel ini akan ditandai sebagai "Deck Juara" dan akan menjadi satu-satunya data yang dihitung dalam Analisis Meta Deck.</p>
+          
+          <div class="search-row" style="margin-bottom: 10px;">
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Nama / Gelar Juara (Event)</label>
+              <input type="text" id="admin-champ-event" placeholder="Misal: Juara 1 TarCamp Season 1">
+            </div>
+            <div class="admin-form-group" style="flex: 1;">
+              <label>Nama Pemain</label>
+              <input type="text" id="admin-champ-player" placeholder="Misal: Budi">
+            </div>
+          </div>
+          <div class="admin-form-group" style="margin-bottom: 14px;">
+            <label>Kode Deck (Paste kode Base64)</label>
+            <input type="text" id="admin-champ-code" placeholder="Paste kode deck di sini...">
+          </div>
+          <div class="admin-form-group" style="margin-bottom: 14px;">
+            <label>Catatan Admin (Opsional)</label>
+            <input type="text" id="admin-champ-note" placeholder="Misal: Deck andalan yang mendominasi meta...">
+          </div>
+          <button class="btn btn-primary" style="background:#d4af37; color:#000;" onclick="submitChampionshipDeck()">🏆 Unggah Deck Juara</button>
         </div>
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
@@ -1412,7 +1488,22 @@
 
   <div class="container">
     <div class="contact-banner">
-      Ada kendala, saran, masukan, atau ingin mendaftar Renathea Camp? Silakan hubungi admin melalui Instagram: <a href="https://instagram.com/anthonyagis" target="_blank">@anthonyagis</a>
+      <h3 style="margin-bottom: 8px;">Ayo Gabung Komunitas Renathea!</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 16px; color: #ddd;">Diskusi meta, cari lawan main, atau daftar Renathea Camp dengan bergabung di server resmi kami.</p>
+      
+      <div class="contact-links">
+        <a href="https://discord.gg/825jZQ7BQg" target="_blank" class="btn-contact btn-discord">
+          <svg width="24" height="24" viewBox="0 0 127.14 96.36" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.73,67.73,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
+          Join Discord
+        </a>
+        <a href="https://tr.ee/IsOjK25ORG" target="_blank" class="btn-contact btn-whatsapp">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12.031 0C5.394 0 0 5.394 0 12.031c0 2.128.553 4.205 1.603 6.03L.211 24l6.096-1.599A11.968 11.968 0,0,0,12.031 24c6.637 0 12.031-5.394 12.031-12.031C24.062 5.394 18.668 0 12.031 0zm0 22.016a9.92 9.92 0,0,1-5.076-1.392l-.364-.216-3.771.99.998-3.676-.237-.377a9.926 9.926 0,0,1-1.519-5.314c0-5.495 4.47-9.965 9.969-9.965 5.495 0 9.969 4.47 9.969 9.965 0 5.495-4.474 9.965-9.969 9.965zm5.467-7.469c-.3-.151-1.776-.877-2.05-.978-.274-.101-.475-.151-.676.151-.201.302-.776.978-.951 1.179-.176.201-.351.226-.652.075-1.345-.632-2.39-1.39-3.267-2.673-.227-.33-.024-.51.127-.66.136-.135.3-.351.451-.527.151-.176.201-.301.301-.502.1-.201.05-.377-.025-.527-.075-.151-.676-1.631-.926-2.233-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.577-.01-.201 0-.526.075-.801.377-.275.301-1.051 1.028-1.051 2.507 0 1.48 1.076 2.913 1.226 3.114.151.201 2.124 3.242 5.143 4.544.718.309 1.278.493 1.716.632.72.228 1.375.195 1.889.118.577-.086 1.776-.726 2.026-1.429.25-.703.25-1.305.175-1.429-.075-.124-.275-.2-.576-.35z"/></svg>
+          Grup WhatsApp
+        </a>
+      </div>
+      <div style="margin-top: 16px; font-size: 0.8rem; color: #888;">
+        Ada kendala, saran, atau masukan? DM Instagram: <a href="https://instagram.com/anthonyagis" target="_blank" style="color: #aaa;">@anthonyagis</a>
+      </div>
     </div>
   </div>
 
@@ -1578,6 +1669,7 @@
     let leaderboardData = [];
     let isAdminLoggedIn = false;
     let currentTestDeckObj = null;
+    let activeDeckFilter = 'all'; // 'all', 'championship', 'community'
 
     // REAL-TIME CLOUD LISTENERS
     function listenToCommunityDecks() {
@@ -1854,13 +1946,29 @@
     }
 
     // FUNGSI EXPORT/IMPORT DECK KODE
+    // Kode di-generate menggunakan format singkat: misal RCS-001,RCS-002, tanpa class/standard
+    function getShortCodeFromId(cardId) {
+      // Ambil bagian sebelum "|" dan hilangkan spasi
+      return cardId.split('|')[0].replace(/\s+/g, '');
+    }
+
+    function getFullIdFromShortCode(shortCode) {
+      // Coba cari kecocokan di database
+      const card = allCards.find(c => {
+         const cShort = c.cardId.split('|')[0].replace(/\s+/g, '');
+         return cShort === shortCode;
+      });
+      return card ? card.cardId : null;
+    }
+
     function exportDeckCode() {
       if (userDeck.length < 9) {
         alert(`⚠️ Deck belum lengkap (${userDeck.length}/9). Isi penuh deck sebelum menyalin kode!`);
         return;
       }
-      const idArray = userDeck.map(c => c.cardId);
-      const idString = idArray.join(',');
+      
+      const shortCodes = userDeck.map(c => getShortCodeFromId(c.cardId));
+      const idString = shortCodes.join(',');
       const base64Code = btoa(idString); // Encode ke Base64
 
       // Tampilkan ke input atau otomatis copy
@@ -1883,22 +1991,30 @@
 
       try {
         const idString = atob(base64Code); // Decode dari Base64
-        const idArray = idString.split(',');
+        const shortCodes = idString.split(',');
 
-        if (idArray.length !== 9) {
+        if (shortCodes.length !== 9) {
           throw new Error("Jumlah kartu tidak valid");
         }
 
         // Cek apakah semua ID ada di database
         const importedCards = [];
-        for (let i = 0; i < idArray.length; i++) {
-          const cardId = idArray[i];
-          const card = allCards.find(c => c.cardId === cardId);
-          if (!card) {
-            alert(`❌ Kartu dengan ID '${cardId}' tidak ditemukan di database saat ini.`);
+        for (let i = 0; i < shortCodes.length; i++) {
+          const shortCode = shortCodes[i];
+          const fullId = getFullIdFromShortCode(shortCode);
+          
+          if (!fullId) {
+             // Fallback mencoba cari ID full langsung (untuk backward compatibility kode lama)
+             const fallbackCard = allCards.find(c => c.cardId === shortCode);
+             if(fallbackCard) {
+                importedCards.push(fallbackCard);
+                continue;
+             }
+             
+            alert(`❌ Kartu dengan kode '${shortCode}' tidak ditemukan di database saat ini.`);
             return;
           }
-          importedCards.push(card);
+          importedCards.push(allCards.find(c => c.cardId === fullId));
         }
 
         // Cek validitas Class ID duplikat
@@ -1923,6 +2039,20 @@
         console.error(e);
       }
     }
+    
+    function copyDeckCodeFromCommunity(deckId) {
+      const deck = communityDecks.find(d => d.id === deckId);
+      if(!deck) return;
+      
+      const shortCodes = deck.cards.map(id => getShortCodeFromId(id));
+      const base64Code = btoa(shortCodes.join(','));
+      
+      navigator.clipboard.writeText(base64Code).then(() => {
+        alert(`✅ Kode Deck '${deck.name}' berhasil disalin ke Clipboard!\n\n${base64Code}`);
+      }).catch(err => {
+        alert(`⚠️ Kode Deck:\n${base64Code}\n\nBlok teks di atas lalu salin manual.`);
+      });
+    }
 
 
     function publishDeckToCommunity() {
@@ -1941,6 +2071,7 @@
         author: username,
         cards: userDeck.map(c => c.cardId),
         totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
+        isChampionship: false, // FLAG BARU: Untuk membedakan deck turnamen dan publik
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -1956,11 +2087,77 @@
         });
     }
 
+    // Fungsi Admin untuk Upload Deck Juara
+    function submitChampionshipDeck() {
+       const eventName = document.getElementById('admin-champ-event').value.trim();
+       const playerName = document.getElementById('admin-champ-player').value.trim();
+       const base64Code = document.getElementById('admin-champ-code').value.trim();
+       const note = document.getElementById('admin-champ-note').value.trim();
+       
+       if(!eventName || !playerName || !base64Code) {
+          alert("⚠️ Nama Event, Nama Pemain, dan Kode Deck wajib diisi!");
+          return;
+       }
+       
+       let importedCardsIds = [];
+       try {
+          const idString = atob(base64Code); 
+          const shortCodes = idString.split(',');
+          if (shortCodes.length !== 9) throw new Error();
+          
+          for (let i = 0; i < shortCodes.length; i++) {
+             const shortCode = shortCodes[i];
+             const fullId = getFullIdFromShortCode(shortCode);
+             if (!fullId) {
+                alert(`❌ Kartu dengan kode '${shortCode}' tidak ditemukan.`);
+                return;
+             }
+             importedCardsIds.push(fullId);
+          }
+       } catch (e) {
+          alert("❌ Kode deck tidak valid atau rusak!");
+          return;
+       }
+       
+       // Hitung total power
+       let totalPwr = 0;
+       importedCardsIds.forEach(id => {
+          const c = allCards.find(cd => cd.cardId === id);
+          if(c) totalPwr += parseInt(c.power);
+       });
+       
+       const newDeck = {
+        name: eventName,
+        note: note,
+        author: playerName,
+        cards: importedCardsIds,
+        totalPower: totalPwr,
+        isChampionship: true, // FLAG CHAMPIONSHIP
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection("community_decks").add(newDeck)
+        .then(() => {
+          alert("🏆 Deck Juara berhasil dipublikasikan dan masuk Meta Analisis!");
+          document.getElementById('admin-champ-event').value = "";
+          document.getElementById('admin-champ-player').value = "";
+          document.getElementById('admin-champ-code').value = "";
+          document.getElementById('admin-champ-note').value = "";
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("❌ Gagal terhubung ke server cloud!");
+        });
+    }
+
     function calculateMetaStats() {
-      if (communityDecks.length === 0) {
-        document.getElementById('meta-top-cards').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data</div>";
-        document.getElementById('meta-top-roles').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data</div>";
-        document.getElementById('meta-top-sets').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data</div>";
+      // HANYA AMBIL DECK TURNAMEN (isChampionship === true)
+      const champDecks = communityDecks.filter(d => d.isChampionship === true);
+      
+      if (champDecks.length === 0) {
+        document.getElementById('meta-top-cards').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
+        document.getElementById('meta-top-roles').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
+        document.getElementById('meta-top-sets').innerHTML = "<div style='color:#888; font-size:0.85rem;'>Belum ada data turnamen</div>";
         return;
       }
 
@@ -1969,8 +2166,7 @@
       const setCountMap = {};
       let totalCardsAnalyzed = 0;
 
-      // Kumpulkan data dari semua deck
-      communityDecks.forEach(deck => {
+      champDecks.forEach(deck => {
         deck.cards.forEach(cardId => {
           totalCardsAnalyzed++;
           const cardObj = allCards.find(c => c.cardId === cardId);
@@ -1983,7 +2179,7 @@
               setCountMap[cardObj.set] = (setCountMap[cardObj.set] || 0) + 1;
             }
 
-            // Hitung Role (Pisahkan jika ada multiple role)
+            // Hitung Role
             let roles = (cardObj.role || "No Role").split('|').map(r => r.trim());
             if (roles.length === 0 || roles[0] === "" || roles[0] === "-") roles = ["No Role"];
             
@@ -1998,11 +2194,11 @@
       const sortedCards = Object.entries(cardCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
       let topCardsHtml = "";
       sortedCards.forEach((item, index) => {
-        const percent = ((item[1] / communityDecks.length) * 100).toFixed(1); // % kemunculan di deck
+        const percent = ((item[1] / champDecks.length) * 100).toFixed(1); // % kemunculan di deck juara
         topCardsHtml += `
           <div class="meta-list-item">
             <span><strong>#${index + 1}</strong> ${item[0]}</span>
-            <span style="color:var(--primary); font-weight:600;">${percent}%</span>
+            <span style="color:#d4af37; font-weight:600;">${percent}%</span>
           </div>
         `;
       });
@@ -2012,7 +2208,7 @@
       const sortedRoles = Object.entries(roleCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
       let topRolesHtml = "";
       sortedRoles.forEach((item, index) => {
-        const percent = ((item[1] / totalCardsAnalyzed) * 100).toFixed(1); // % dari total kartu
+        const percent = ((item[1] / totalCardsAnalyzed) * 100).toFixed(1);
         topRolesHtml += `
           <div class="meta-list-item">
             <span>${item[0]}</span>
@@ -2037,20 +2233,43 @@
       document.getElementById('meta-top-sets').innerHTML = topSetsHtml || "<div style='color:#888; font-size:0.85rem;'>Tidak ada data Set</div>";
     }
 
+    function setDeckFilter(filterType) {
+       activeDeckFilter = filterType;
+       
+       // Update style tombol
+       document.getElementById('filter-all-decks').style.background = filterType === 'all' ? 'var(--primary)' : '#e0e0e0';
+       document.getElementById('filter-all-decks').style.color = filterType === 'all' ? '#fff' : 'var(--text-main)';
+       
+       document.getElementById('filter-champ-decks').style.background = filterType === 'championship' ? 'var(--primary)' : '#e0e0e0';
+       document.getElementById('filter-champ-decks').style.color = filterType === 'championship' ? '#fff' : 'var(--text-main)';
+       
+       document.getElementById('filter-comm-decks').style.background = filterType === 'community' ? 'var(--primary)' : '#e0e0e0';
+       document.getElementById('filter-comm-decks').style.color = filterType === 'community' ? '#fff' : 'var(--text-main)';
+       
+       renderCommunityDecks();
+    }
 
     function renderCommunityDecks() {
-      // Panggil kalkulasi meta setiap kali deck komunitas di render ulang
+      // Panggil kalkulasi meta (Hanya dari deck juara)
       calculateMetaStats();
 
       const grid = document.getElementById('community-deck-grid');
       grid.innerHTML = "";
+      
+      // Filter list berdasarkan tombol yang aktif
+      let displayDecks = communityDecks;
+      if (activeDeckFilter === 'championship') {
+         displayDecks = communityDecks.filter(d => d.isChampionship === true);
+      } else if (activeDeckFilter === 'community') {
+         displayDecks = communityDecks.filter(d => d.isChampionship !== true);
+      }
 
-      if (communityDecks.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck komunitas yang dipublikasikan.</div>`;
+      if (displayDecks.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Belum ada deck yang sesuai filter.</div>`;
         return;
       }
 
-      communityDecks.forEach((deck) => {
+      displayDecks.forEach((deck) => {
         let cardRowsHtml = "";
         deck.cards.forEach((cardId, i) => {
           const cardObj = allCards.find(c => c.cardId === cardId);
@@ -2062,17 +2281,21 @@
           `;
         });
 
+        const isChamp = deck.isChampionship === true;
         const deckEl = document.createElement('div');
-        deckEl.className = 'community-deck-card';
+        deckEl.className = `community-deck-card ${isChamp ? 'championship-deck-border' : ''}`;
+        
         deckEl.innerHTML = `
-          <div class="community-deck-title">${deck.name}</div>
+          ${isChamp ? '<div class="card-championship-tag" style="top: -12px; left: 16px; bottom: auto;">🏆 Deck Juara Meta</div>' : ''}
+          <div class="community-deck-title" style="${isChamp ? 'margin-top: 10px;' : ''}">${deck.name}</div>
           <div class="community-deck-meta">Oleh: <strong>${deck.author}</strong> | Total Power: <strong>${deck.totalPower}</strong> | ${deck.updatedAt}</div>
           <div class="community-deck-note">"${deck.note || '-'}"</div>
           <div class="community-card-preview-list">${cardRowsHtml}</div>
           <div style="display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap;">
-            <button class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:6px 8px;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat ke Builder</button>
-            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji Deck & Analisis</button>
-            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.8rem; padding:6px 8px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus</button>` : ''}
+            <button class="btn btn-primary" style="flex:1; font-size:0.75rem; padding:6px 8px;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat</button>
+            <button class="btn btn-secondary" style="font-size:0.75rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji</button>
+            <button class="btn btn-info" style="font-size:0.75rem; padding:6px 8px;" onclick="copyDeckCodeFromCommunity('${deck.id}')">📋 Salin Kode</button>
+            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.75rem; padding:6px 8px; flex-basis: 100%; margin-top:4px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus Deck (Admin)</button>` : ''}
           </div>
         `;
         grid.appendChild(deckEl);
