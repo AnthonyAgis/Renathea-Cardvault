@@ -423,6 +423,8 @@
       padding: 8px 10px;
       border-radius: 0 4px 4px 0;
       margin-top: auto;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .skill-line {
@@ -710,28 +712,30 @@
 
     .camp-info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
       margin-bottom: 30px;
     }
 
     .camp-card {
       background: #fff;
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 20px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border-color);
       border-top: 5px solid var(--primary);
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .camp-card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 12px;
+      font-size: 1.15rem;
+      margin-bottom: 10px;
       color: #111;
     }
 
     .camp-card ul {
-      padding-left: 20px;
+      padding-left: 18px;
       font-size: 0.88rem;
       color: #444;
     }
@@ -747,11 +751,13 @@
       box-shadow: var(--shadow);
       border: 1px solid var(--border-color);
       margin-bottom: 24px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .camp-directory-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 16px;
       margin-top: 14px;
     }
@@ -763,6 +769,8 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .camp-directory-title {
@@ -784,12 +792,13 @@
       background: var(--primary);
       color: #fff;
       text-align: center;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 600;
       text-decoration: none;
       transition: background 0.2s;
+      word-break: break-all;
     }
 
     .camp-link-btn:hover {
@@ -797,11 +806,14 @@
     }
 
     .schedule-item {
-      padding: 12px 0;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      gap: 12px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .schedule-item:last-child {
@@ -964,6 +976,7 @@
       color: var(--text-muted);
     }
 
+    /* MEDIA QUERIES UNTUK TAMPILAN MOBILE & TABLET */
     @media (max-width: 900px) {
       .deck-builder-layout, .admin-layout {
         grid-template-columns: 1fr;
@@ -981,6 +994,28 @@
       }
       .deck-actions button {
         width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 12px;
+        margin: 16px auto;
+      }
+      .section-box, .search-panel {
+        padding: 16px;
+      }
+      .camp-info-grid, .camp-directory-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .schedule-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .schedule-item > div:last-child {
+        width: 100%;
+        margin-top: 8px;
       }
     }
   </style>
@@ -1079,8 +1114,8 @@
 
           <label style="font-size:0.8rem; font-weight:600; color:#555;">FORMAT PERTANDINGAN</label>
           <select id="deck-format-select" class="deck-input" onchange="onFormatChange()">
-            <option value="Origin">Origin Format (Max 9 Kartu)</option>
-            <option value="Ark">Ark Format (Max 12 Kartu / 9 Main + 3 Reserve)</option>
+            <option value="Origin">Origin Format</option>
+            <option value="Ark">Ark Format</option>
           </select>
 
           <!-- PENJELASAN INTERAKTIF FORMAT PERTANDINGAN -->
@@ -1790,7 +1825,7 @@
       if (!text) return '-';
       const urlRegex = /(https?:\/\/[^\s]+)/g;
       return text.replace(urlRegex, function(url) {
-        return `<a href="${url}" target="_blank" style="color:var(--primary); font-weight:600; text-decoration:underline;">${url}</a>`;
+        return `<a href="${url}" target="_blank" style="color:var(--primary); font-weight:600; text-decoration:underline; word-break:break-all;">${url}</a>`;
       });
     }
 
@@ -2331,7 +2366,6 @@
     function calculateMetaStats() {
       let champDecks = communityDecks.filter(d => d.isChampionship === true);
       
-      // Filter Analisis Meta berdasarkan Format Pilihan
       if (activeFormatFilter !== 'all') {
          champDecks = champDecks.filter(d => d.format === activeFormatFilter);
       }
@@ -2806,11 +2840,11 @@
         const row = document.createElement('div');
         row.className = 'schedule-item';
         row.innerHTML = `
-          <div>
+          <div style="flex: 1;">
             <span style="background: ${badgeColor}; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">${item.type}</span>
             <h4 style="margin-top: 6px; font-size: 1.05rem; color: #111;">${item.title}</h4>
             <p style="font-size: 0.85rem; color: #555; margin-top: 2px;">🕒 ${item.time}</p>
-            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 6px; border-radius: 4px;">${autoLinkify(item.desc)}</p>` : ''}
+            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 8px; border-radius: 4px;">${autoLinkify(item.desc)}</p>` : ''}
           </div>
           ${isAdminLoggedIn ? `
             <div style="display:flex; gap:6px; align-items:center;">
