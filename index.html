@@ -1145,6 +1145,14 @@
             <button class="btn btn-primary" style="flex:1;" onclick="publishDeckToCommunity()">🌐 Publikasikan</button>
             <button class="btn btn-secondary" onclick="clearCurrentDeck()">Kosongkan</button>
           </div>
+
+          <!-- PANEL KHUSUS ADMIN UNTUK PUBLISH DECK JUARA -->
+          <div id="admin-deck-publish-section" style="display:none; margin-top:16px; padding-top:16px; border-top:2px dashed #d4af37; background:#fffdf5; padding:12px; border-radius:6px;">
+            <h4 style="font-size:0.9rem; color:#8a7300; margin-bottom:8px;">🏆 Publish Deck Juara (Admin)</h4>
+            <input type="text" id="admin-deck-event-input" class="deck-input" placeholder="Nama Event (Cth: Juara 1 TarCamp)" style="margin-bottom:8px;" />
+            <input type="text" id="admin-deck-player-input" class="deck-input" placeholder="Nama Pemain / Pemenang" style="margin-bottom:8px;" />
+            <button class="btn btn-primary" style="width:100%; background:#d4af37; color:#000; font-weight:bold;" onclick="publishAdminChampionshipDeck()">🏆 Simpan sebagai Deck Juara</button>
+          </div>
           
           <div class="deck-code-section">
             <label style="font-size:0.8rem; font-weight:600; color:#555;">KODE DECK (IMPORT / EXPORT)</label>
@@ -1362,41 +1370,6 @@
           <h2>Panel Pengelola Admin</h2>
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
         </div>
-        
-        <!-- ADMIN: PUBLIKASI DECK JUARA -->
-        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #d4af37; background: #fffdf5;">
-          <h3 style="margin-bottom: 14px; color: #8a7300;">🏆 Publikasikan Deck Juara Turnamen (Masuk Meta)</h3>
-          <p style="font-size: 0.85rem; color: #555; margin-bottom: 12px;">Deck yang diunggah melalui panel ini akan ditandai sebagai "Deck Juara" dan akan masuk ke perhitungan Analisis Meta.</p>
-          
-          <div class="search-row" style="margin-bottom: 10px;">
-            <div class="admin-form-group" style="flex: 1;">
-              <label>Format Pertandingan</label>
-              <select id="admin-champ-format" class="deck-input" style="margin-bottom:0;">
-                <option value="Origin">Origin Format</option>
-                <option value="Ark">Ark Format</option>
-              </select>
-            </div>
-            <div class="admin-form-group" style="flex: 1;">
-              <label>Nama / Gelar Juara (Event)</label>
-              <input type="text" id="admin-champ-event" placeholder="Misal: Juara 1 TarCamp Season 1">
-            </div>
-          </div>
-          <div class="search-row" style="margin-bottom: 10px;">
-            <div class="admin-form-group" style="flex: 1;">
-              <label>Nama Pemain</label>
-              <input type="text" id="admin-champ-player" placeholder="Misal: Budi">
-            </div>
-            <div class="admin-form-group" style="flex: 1;">
-              <label>Catatan Admin (Opsional)</label>
-              <input type="text" id="admin-champ-note" placeholder="Misal: Deck andalan...">
-            </div>
-          </div>
-          <div class="admin-form-group" style="margin-bottom: 14px;">
-            <label>Kode Deck (Paste kode Base64)</label>
-            <input type="text" id="admin-champ-code" placeholder="Paste kode deck di sini...">
-          </div>
-          <button class="btn btn-primary" style="background:#d4af37; color:#000;" onclick="submitChampionshipDeck()">🏆 Unggah Deck Juara</button>
-        </div>
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">🏕️ Tambah / Kelola Renathea Camp Resmi</h3>
@@ -1480,7 +1453,7 @@
           </div>
           <div class="search-row" style="margin-bottom: 10px;">
             <div class="admin-form-group" style="flex: 1;">
-              <label>Total Power / Poin</label>
+              <label>Total Power / Poin (Bisa diisi 0)</label>
               <input type="number" id="lb-power-input" value="0">
             </div>
           </div>
@@ -2299,52 +2272,29 @@
         });
     }
 
-    function submitChampionshipDeck() {
-       const format = document.getElementById('admin-champ-format').value;
-       const eventName = document.getElementById('admin-champ-event').value.trim();
-       const playerName = document.getElementById('admin-champ-player').value.trim();
-       const base64Code = document.getElementById('admin-champ-code').value.trim();
-       const note = document.getElementById('admin-champ-note').value.trim();
-       
-       if(!eventName || !playerName || !base64Code) {
-          alert("⚠️ Nama Event, Nama Pemain, dan Kode Deck wajib diisi!");
-          return;
-       }
-       
-       let importedCardsIds = [];
-       try {
-          const idString = atob(base64Code); 
-          const shortCodes = idString.split(',');
-          const reqCount = format === 'Origin' ? 9 : 12;
-          if (shortCodes.length !== reqCount) throw new Error();
-          
-          for (let i = 0; i < shortCodes.length; i++) {
-             const shortCode = shortCodes[i];
-             const fullId = getFullIdFromShortCode(shortCode);
-             if (!fullId) {
-                alert(`❌ Kartu dengan kode '${shortCode}' tidak ditemukan.`);
-                return;
-             }
-             importedCardsIds.push(fullId);
-          }
-       } catch (e) {
-          alert("❌ Kode deck tidak valid atau jumlah kartu tidak sesuai dengan format yang dipilih!");
-          return;
-       }
-       
-       let totalPwr = 0;
-       importedCardsIds.forEach(id => {
-          const c = allCards.find(cd => cd.cardId === id);
-          if(c) totalPwr += parseInt(c.power);
-       });
-       
-       const newDeck = {
+    function publishAdminChampionshipDeck() {
+      const format = document.getElementById('deck-format-select').value;
+      const reqCount = format === 'Origin' ? 9 : 12;
+      const eventName = document.getElementById('admin-deck-event-input').value.trim();
+      const playerName = document.getElementById('admin-deck-player-input').value.trim();
+      const deckNote = document.getElementById('deck-note-input').value.trim();
+
+      if (!eventName || !playerName) {
+        alert("⚠️ Nama Event dan Nama Pemain wajib diisi!");
+        return;
+      }
+      if (userDeck.length < reqCount) {
+        alert(`⚠️ Deck belum lengkap! Format ${format} harus berisi ${reqCount} kartu. (Saat ini baru ${userDeck.length}/${reqCount} kartu)`);
+        return;
+      }
+
+      const newDeck = {
         name: eventName,
-        note: note,
+        note: deckNote,
         author: playerName,
         format: format,
-        cards: importedCardsIds,
-        totalPower: totalPwr,
+        cards: userDeck.map(c => c.cardId),
+        totalPower: userDeck.reduce((sum, c) => sum + (parseInt(c.power) || 0), 0),
         isChampionship: true,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -2352,10 +2302,10 @@
       db.collection("community_decks").add(newDeck)
         .then(() => {
           alert("🏆 Deck Juara berhasil dipublikasikan dan masuk Meta Analisis!");
-          document.getElementById('admin-champ-event').value = "";
-          document.getElementById('admin-champ-player').value = "";
-          document.getElementById('admin-champ-code').value = "";
-          document.getElementById('admin-champ-note').value = "";
+          document.getElementById('admin-deck-event-input').value = "";
+          document.getElementById('admin-deck-player-input').value = "";
+          clearDeckForm();
+          switchMainTab('community-tab');
         })
         .catch((err) => {
           console.error(err);
@@ -2868,7 +2818,8 @@
     function submitLeaderboardEntry() {
       const name = document.getElementById('lb-name-input').value.trim();
       const camp = document.getElementById('lb-camp-input').value.trim();
-      const power = parseInt(document.getElementById('lb-power-input').value) || 0;
+      const powerInput = document.getElementById('lb-power-input').value;
+      const power = powerInput === "" ? 0 : parseInt(powerInput) || 0;
 
       if (!name) {
         alert("⚠️ Nama pemain wajib diisi!");
@@ -2924,16 +2875,19 @@
     function checkAdminAuthStatus() {
       const loginBox = document.getElementById('admin-login-box');
       const dashBox = document.getElementById('admin-dashboard-box');
+      const adminDeckPublishSec = document.getElementById('admin-deck-publish-section');
 
       if (isAdminLoggedIn) {
         loginBox.style.display = 'none';
         dashBox.style.display = 'block';
+        if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'block';
         renderAdminTable();
         renderCampDirectories();
         renderLeaderboardTable();
       } else {
         loginBox.style.display = 'block';
         dashBox.style.display = 'none';
+        if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
       }
     }
 
@@ -2952,6 +2906,8 @@
     function handleAdminLogout() {
       isAdminLoggedIn = false;
       checkAdminAuthStatus();
+      const adminDeckPublishSec = document.getElementById('admin-deck-publish-section');
+      if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
       alert("🔒 Berhasil logout dari admin.");
     }
 
