@@ -8,6 +8,7 @@
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
   <style>
     :root {
@@ -1393,9 +1394,11 @@
     <!-- TAB 6: ADMIN DASHBOARD -->
     <div id="admin-tab" class="tab-content">
       
+      <!-- FORM LOGIN ADMIN BERBASIS FIREBASE AUTHENTICATION -->
       <div id="admin-login-box" class="admin-auth-box">
-        <h2 style="margin-bottom: 16px; color: #111;">Admin Login</h2>
-        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Masukkan password admin untuk mengakses panel pengelola.</p>
+        <h2 style="margin-bottom: 16px; color: #111;">Admin Login (Firebase Auth)</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Masukkan Email dan Password akun Admin Firebase Anda.</p>
+        <input type="email" id="admin-email-input" class="deck-input" placeholder="Email Admin">
         <input type="password" id="admin-pass-input" class="deck-input" placeholder="Password Admin">
         <button class="btn btn-primary" style="width: 100%; padding: 10px;" onclick="handleAdminLogin()">Masuk Dashboard</button>
       </div>
@@ -1684,7 +1687,7 @@
   </div>
 
   <script>
-    // FIREBASE CONFIG LENGKAP YANG SUDAH TERHUBUNG KE PROJECT ANDA
+    // FIREBASE CONFIG LENGKAP YANG TERHUBUNG KE PROJECT ANDA
     const firebaseConfig = {
       apiKey: "AIzaSyAkBN6Ezrekc_1VMiQlwPjpS40wHOH5YnM",
       authDomain: "renathea-cardvault.firebaseapp.com",
@@ -1697,6 +1700,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
     const defaultCards = [
       {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
@@ -1808,6 +1812,16 @@
     let currentTestDeckObj = null;
     let activeDeckFilter = 'all';
     let activeFormatFilter = 'all';
+
+    // MONITOR STATUS AUTHENTICATION FIREBASE
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        isAdminLoggedIn = true;
+      } else {
+        isAdminLoggedIn = false;
+      }
+      checkAdminAuthStatus();
+    });
 
     function listenToCommunityDecks() {
       db.collection("community_decks").orderBy("createdAt", "desc")
@@ -2354,7 +2368,7 @@
         })
         .catch((err) => {
           console.error(err);
-          alert("❌ Gagal terhubung ke server cloud!");
+          alert("❌ Gagal terhubung ke server cloud! Pastikan Anda sudah login sebagai Admin.");
         });
     }
 
@@ -2937,23 +2951,29 @@
     }
 
     function handleAdminLogin() {
-      const pass = document.getElementById('admin-pass-input').value;
-      if (pass === "Azezax10") {
-        isAdminLoggedIn = true;
-        document.getElementById('admin-pass-input').value = "";
-        checkAdminAuthStatus();
-        alert("✅ Login admin berhasil!");
-      } else {
-        alert("❌ Password salah!");
+      const email = document.getElementById('admin-email-input').value.trim();
+      const pass = document.getElementById('admin-pass-input').value.trim();
+
+      if (!email || !pass) {
+        alert("⚠️ Masukkan Email dan Password Admin!");
+        return;
       }
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+          alert("✅ Login Admin berhasil melalui Firebase Authentication!");
+          document.getElementById('admin-email-input').value = "";
+          document.getElementById('admin-pass-input').value = "";
+        })
+        .catch((error) => {
+          alert("❌ Login gagal: " + error.message);
+        });
     }
 
     function handleAdminLogout() {
-      isAdminLoggedIn = false;
-      checkAdminAuthStatus();
-      const adminDeckPublishSec = document.getElementById('admin-deck-publish-section');
-      if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
-      alert("🔒 Berhasil logout dari admin.");
+      auth.signOut().then(() => {
+        alert("🔒 Berhasil logout dari admin.");
+      });
     }
 
     function renderAdminTable() {
