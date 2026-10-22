@@ -321,22 +321,25 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     }
 
+    /* DIPERBAIKI: Menggunakan contain agar gambar tampil utuh, tidak zoom-in terpotong */
     .card-image {
-      height: 200px;
-      background-color: #eee;
+      height: 220px;
+      background-color: #1a1a1a;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      background-size: cover;
+      background-size: contain;
+      background-repeat: no-repeat;
       background-position: center;
     }
 
     .card-image-placeholder {
       font-weight: bold;
-      color: #888;
+      color: #aaa;
       text-align: center;
       padding: 10px;
+      font-size: 0.9rem;
     }
 
     .card-badge {
@@ -1734,19 +1737,25 @@
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Temple of Thales","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Protect lain di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Ward Keeper","characterId":"Animatherea - Millice S.","cardId":"RCS - 072 | Standard","category":"Convergence"}
     ];
 
-    // PENGHUBUNG GAMBAR (MENYESUAIKAN FORMAT NAMA FILE DENGAN SPASI: RCS - 001  Standard.jpg)
-    const folderGambar = 'images'; // Nama folder gambar
-    const ekstensiGambar = '.jpg'; // Format ekstensi (.jpg / .png)
+    // PENGHUBUNG GAMBAR (FORMAT: RCS - 001  Standard.jpg)
+    const folderGambar = 'images';
+    const ekstensiGambar = '.jpg';
 
     defaultCards.forEach(card => {
       if (!card.image) {
-        // Menghapus simbol '|' saja, mempertahankan spasi dan format asli cardId Anda
         const filenameId = card.cardId.replace('|', '').trim();
         card.image = `${folderGambar}/${filenameId}${ekstensiGambar}`;
       }
     });
 
-    let allCards = [...defaultCards];
+    // SISTEM PENYIMPANAN LOCALSTORAGE AGAR DATA TIDAK HILANG / TER-REPLACE
+    let savedCards = localStorage.getItem('renathea_cards_v3');
+    let allCards = savedCards ? JSON.parse(savedCards) : [...defaultCards];
+
+    function saveCardsToStorage() {
+      localStorage.setItem('renathea_cards_v3', JSON.stringify(allCards));
+    }
+
     let userDeck = [];
     let communityDecks = [];
     let campSchedules = [];
@@ -2949,6 +2958,7 @@
       if (editIndex >= 0) { allCards[editIndex] = cardData; alert("✅ Kartu diperbarui!"); }
       else { allCards.push(cardData); alert("✅ Kartu ditambahkan!"); }
 
+      saveCardsToStorage(); // Menyimpan ke localStorage agar tidak hilang
       resetAdminForm();
       renderAdminTable();
       renderCards(allCards);
@@ -2974,6 +2984,7 @@
     function deleteCard(index) {
       if (confirm("Hapus kartu ini?")) {
         allCards.splice(index, 1);
+        saveCardsToStorage(); // Menyimpan ke localStorage
         renderAdminTable();
         renderCards(allCards);
       }
@@ -2988,10 +2999,11 @@
 
     function resetToDefaultData() {
       if (confirm("Reset database ke awal?")) {
+        localStorage.removeItem('renathea_cards_v3');
         allCards = [...defaultCards];
         renderAdminTable();
         renderCards(allCards);
-        alert("✅ Database direset.");
+        alert("✅ Database direset ke bawaan.");
       }
     }
 
@@ -3000,13 +3012,19 @@
       if (card) showModal(card);
     }
 
+    // MODAL DENGAN PREVIEW GAMBAR UTUH
     function showModal(card) {
       document.getElementById('modal-title').textContent = card.name;
       document.getElementById('modal-id').textContent = card.cardId;
       const formattedSkill = formatSkillText(card.skill);
 
+      const modalBgStyle = card.image ? `background-image: url('${card.image}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 280px; background-color: #1a1a1a; border-radius: 6px; margin-bottom: 16px;` : '';
+
       const detailsContainer = document.getElementById('modal-details');
       detailsContainer.innerHTML = `
+        <div style="grid-column: 1 / -1;">
+          ${card.image ? `<div style="${modalBgStyle}"></div>` : '<div style="text-align:center; color:#888; padding:20px; background:#f0f0f0; margin-bottom:16px; border-radius:6px;">Tidak ada gambar</div>'}
+        </div>
         <div><label>Kategori</label><p>${card.category || '-'}</p></div>
         <div><label>Series</label><p>${card.series || '-'}</p></div>
         <div><label>Nama Set</label><p>${card.set}</p></div>
