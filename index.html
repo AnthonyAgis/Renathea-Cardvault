@@ -1684,14 +1684,15 @@
   </div>
 
   <script>
-    // MASUKKAN KONFIGURASI FIREBASE ASLI ANDA DARI FIREBASE CONSOLE DI SINI
+    // FIREBASE CONFIG LENGKAP YANG SUDAH TERHUBUNG KE PROJECT ANDA
     const firebaseConfig = {
-      apiKey: "PASTE_API_KEY_ANDA_DI_SINI",
+      apiKey: "AIzaSyAkBN6Ezrekc_1VMiQlwPjpS40wHOH5YnM",
       authDomain: "renathea-cardvault.firebaseapp.com",
       projectId: "renathea-cardvault",
-      storageBucket: "renathea-cardvault.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
+      storageBucket: "renathea-cardvault.firebasestorage.app",
+      messagingSenderId: "792334995299",
+      appId: "1:792334995299:web:a90fc681372dde06180d56",
+      measurementId: "G-RPGK6VVKT4"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -2312,7 +2313,7 @@
         })
         .catch((err) => {
           console.error("Gagal menyimpan ke cloud:", err);
-          alert("❌ Gagal terhubung ke server cloud!");
+          alert("❌ Gagal terhubung ke server cloud! Silakan cek aturan keamanan Firestore Anda.");
         });
     }
 
@@ -2609,3 +2610,484 @@
 
       rolesList.forEach(role => {
         let count = 0;
+        if (role === 'No Role') {
+          count = fullCards.filter(c => !c.role || c.role === '-' || c.role.trim() === '').length;
+        } else {
+          count = fullCards.filter(c => c.role && c.role.toLowerCase().includes(role.toLowerCase())).length;
+        }
+
+        if (count > 0) {
+          roleBreakdownEl.innerHTML += `
+            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+              <strong>${role}</strong> (${count} kartu)
+            </div>
+          `;
+        }
+      });
+
+      const keywordsList = ['Powerup', 'Silence', 'Protect', 'Law', 'Copy', 'Passive', 'No Skill'];
+      const kwBreakdownEl = document.getElementById('stat-keyword-breakdown');
+      kwBreakdownEl.innerHTML = "";
+
+      keywordsList.forEach(kw => {
+        let count = 0;
+        if (kw === 'No Skill') {
+          count = fullCards.filter(c => (!c.skill || c.skill === '-') && (!c.keyword || c.keyword === '-')).length;
+        } else {
+          count = fullCards.filter(c => c.keyword && c.keyword.toLowerCase().includes(kw.toLowerCase())).length;
+        }
+
+        if (count > 0) {
+          kwBreakdownEl.innerHTML += `
+            <div style="background:#fff; border:1px solid #ddd; padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+              <strong>${kw}</strong> (${count} kartu)
+            </div>
+          `;
+        }
+      });
+    }
+
+    function loadDeckToBuilder(deckId) {
+      const target = communityDecks.find(d => d.id === deckId);
+      if (!target) return;
+      document.getElementById('deck-format-select').value = target.format || 'Origin';
+      onFormatChange();
+      document.getElementById('deck-name-input').value = target.name;
+      document.getElementById('deck-note-input').value = target.note;
+      document.getElementById('deck-username-input').value = target.author !== "Pemain Komunitas" ? target.author : "";
+      userDeck = target.cards.map(id => allCards.find(c => c.cardId === id)).filter(Boolean);
+      switchMainTab('deck-tab');
+      alert(`✅ Deck dimuat ke Deck Builder!`);
+    }
+
+    function deleteCommunityDeck(deckId) {
+      if (confirm("Hapus deck ini dari cloud server sebagai admin?")) {
+        db.collection("community_decks").doc(deckId).delete()
+          .then(() => alert("✅ Deck berhasil dihapus dari cloud!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
+      }
+    }
+
+    function editCampDirectory(id) {
+      const item = campDirectories.find(c => c.id === id);
+      if (!item) return;
+      document.getElementById('dir-edit-id').value = id;
+      document.getElementById('dir-name-input').value = item.name || '';
+      document.getElementById('dir-captain-input').value = item.captain || '';
+      document.getElementById('dir-location-input').value = item.location || '';
+      document.getElementById('dir-schedule-input').value = item.schedule || '';
+      document.getElementById('dir-link-input').value = item.link || '';
+      document.getElementById('dir-submit-btn').textContent = "💾 Update Data Camp";
+      switchMainTab('admin-tab');
+      document.getElementById('dir-name-input').focus();
+    }
+
+    function resetCampDirectoryForm() {
+      document.getElementById('dir-edit-id').value = "";
+      document.getElementById('dir-name-input').value = "";
+      document.getElementById('dir-captain-input').value = "";
+      document.getElementById('dir-location-input').value = "";
+      document.getElementById('dir-schedule-input').value = "";
+      document.getElementById('dir-link-input').value = "";
+      document.getElementById('dir-submit-btn').textContent = "➕ Tambahkan Camp ke Direktori Cloud";
+    }
+
+    function submitCampDirectory() {
+      const editId = document.getElementById('dir-edit-id').value;
+      const name = document.getElementById('dir-name-input').value.trim();
+      const captain = document.getElementById('dir-captain-input').value.trim();
+      const location = document.getElementById('dir-location-input').value.trim();
+      const schedule = document.getElementById('dir-schedule-input').value.trim();
+      const link = document.getElementById('dir-link-input').value.trim();
+
+      if (!name || !captain) {
+        alert("⚠️ Nama Camp dan Camp Captain wajib diisi!");
+        return;
+      }
+
+      const dirData = {
+        name, captain, location, schedule, link,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (editId) {
+        db.collection("camp_directories").doc(editId).update(dirData)
+          .then(() => {
+            alert("✅ Data Renathea Camp berhasil diperbarui!");
+            resetCampDirectoryForm();
+          })
+          .catch(err => alert("❌ Gagal memperbarui: " + err.message));
+      } else {
+        dirData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection("camp_directories").add(dirData)
+          .then(() => {
+            alert("✅ Renathea Camp berhasil ditambahkan ke Cloud!");
+            resetCampDirectoryForm();
+          })
+          .catch(err => alert("❌ Gagal menyimpan: " + err.message));
+      }
+    }
+
+    function renderCampDirectories() {
+      const grid = document.getElementById('camp-directory-grid');
+      grid.innerHTML = "";
+
+      if (campDirectories.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 20px;">Belum ada data Camp terdaftar.</div>`;
+        return;
+      }
+
+      campDirectories.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'camp-directory-card';
+        card.innerHTML = `
+          <div class="camp-directory-title">🏕️ ${item.name}</div>
+          <div class="camp-directory-meta">👑 <strong>Captain:</strong> ${item.captain}</div>
+          <div class="camp-directory-meta">📍 <strong>Lokasi:</strong> ${item.location || '-'}</div>
+          <div class="camp-directory-meta" style="margin-bottom: 12px;">🕒 <strong>Jadwal:</strong> ${item.schedule || '-'}</div>
+          ${item.link ? `<a href="${item.link}" target="_blank" class="camp-link-btn">🔗 Gabung Komunitas Camp</a>` : ''}
+          ${isAdminLoggedIn ? `
+            <div style="display:flex; gap:6px; margin-top:8px;">
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px; flex:1;" onclick="editCampDirectory('${item.id}')">✏️ Edit Camp</button>
+              <button class="btn btn-danger" style="font-size: 0.75rem; padding: 4px; flex:1;" onclick="deleteCampDirectory('${item.id}')">🗑️ Hapus</button>
+            </div>
+          ` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function deleteCampDirectory(id) {
+      if (confirm("Hapus Camp ini dari server?")) {
+        db.collection("camp_directories").doc(id).delete()
+          .then(() => alert("✅ Camp berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
+      }
+    }
+
+    function editCampSchedule(id) {
+      const item = campSchedules.find(s => s.id === id);
+      if (!item) return;
+      document.getElementById('camp-edit-id').value = id;
+      document.getElementById('camp-type-input').value = item.type || 'OnCamp';
+      document.getElementById('camp-title-input').value = item.title || '';
+      document.getElementById('camp-time-input').value = item.time || '';
+      document.getElementById('camp-desc-input').value = item.desc || '';
+      document.getElementById('camp-submit-btn').textContent = "💾 Update Jadwal";
+      switchMainTab('admin-tab');
+      document.getElementById('camp-title-input').focus();
+    }
+
+    function resetCampScheduleForm() {
+      document.getElementById('camp-edit-id').value = "";
+      document.getElementById('camp-title-input').value = "";
+      document.getElementById('camp-time-input').value = "";
+      document.getElementById('camp-desc-input').value = "";
+      document.getElementById('camp-submit-btn').textContent = "📢 Publikasikan Jadwal ke Cloud";
+    }
+
+    function submitCampSchedule() {
+      const editId = document.getElementById('camp-edit-id').value;
+      const type = document.getElementById('camp-type-input').value;
+      const title = document.getElementById('camp-title-input').value.trim();
+      const time = document.getElementById('camp-time-input').value.trim();
+      const desc = document.getElementById('camp-desc-input').value.trim();
+
+      if (!title || !time) {
+        alert("⚠️ Nama Camp dan Waktu Pelaksanaan wajib diisi!");
+        return;
+      }
+
+      const schedData = {
+        type, title, time, desc,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (editId) {
+        db.collection("camp_schedules").doc(editId).update(schedData)
+          .then(() => {
+            alert("📢 Jadwal Renathea Camp berhasil diperbarui!");
+            resetCampScheduleForm();
+          })
+          .catch(err => alert("❌ Gagal memperbarui: " + err.message));
+      } else {
+        schedData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection("camp_schedules").add(schedData)
+          .then(() => {
+            alert("📢 Jadwal Renathea Camp berhasil dipublikasikan ke Cloud!");
+            resetCampScheduleForm();
+          })
+          .catch(err => alert("❌ Gagal mempublikasikan: " + err.message));
+      }
+    }
+
+    function renderCampSchedules() {
+      const listBox = document.getElementById('schedule-list-box');
+      listBox.innerHTML = "";
+
+      if (campSchedules.length === 0) {
+        listBox.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">Belum ada jadwal Renathea Camp yang diumumkan.</div>`;
+        return;
+      }
+
+      campSchedules.forEach((item) => {
+        const badgeColor = item.type === 'OnCamp' ? '#e60012' : item.type === 'Campless' ? '#2b2b2b' : item.type === 'TarCamp' ? '#0066cc' : item.type === 'Turnamen Nasional' ? '#d4af37' : '#800080';
+        const row = document.createElement('div');
+        row.className = 'schedule-item';
+        row.innerHTML = `
+          <div style="flex: 1;">
+            <span style="background: ${badgeColor}; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">${item.type}</span>
+            <h4 style="margin-top: 6px; font-size: 1.05rem; color: #111;">${item.title}</h4>
+            <p style="font-size: 0.85rem; color: #555; margin-top: 2px;">🕒 ${item.time}</p>
+            ${item.desc ? `<p style="font-size: 0.82rem; color: #666; margin-top: 4px; background: #f8f9fa; padding: 8px; border-radius: 4px;">${autoLinkify(item.desc)}</p>` : ''}
+          </div>
+          ${isAdminLoggedIn ? `
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px;" onclick="editCampSchedule('${item.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" style="font-size: 0.8rem; padding: 4px 10px;" onclick="deleteCampSchedule('${item.id}')">🗑️ Hapus</button>
+            </div>
+          ` : ''}
+        `;
+        listBox.appendChild(row);
+      });
+    }
+
+    function deleteCampSchedule(id) {
+      if (confirm("Hapus jadwal ini dari server?")) {
+        db.collection("camp_schedules").doc(id).delete()
+          .then(() => alert("✅ Jadwal berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
+      }
+    }
+
+    function submitLeaderboardEntry() {
+      const name = document.getElementById('lb-name-input').value.trim();
+      const camp = document.getElementById('lb-camp-input').value.trim();
+      const powerInput = document.getElementById('lb-power-input').value;
+      const power = powerInput === "" ? 0 : parseInt(powerInput) || 0;
+
+      if (!name) {
+        alert("⚠️ Nama pemain wajib diisi!");
+        return;
+      }
+
+      const docId = name.toLowerCase().replace(/\s+/g, '_');
+
+      db.collection("leaderboard").doc(docId).set({
+        name, camp, power,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert("🏆 Leaderboard berhasil diperbarui dan diurutkan otomatis di Cloud!");
+        document.getElementById('lb-name-input').value = "";
+        document.getElementById('lb-camp-input').value = "";
+        document.getElementById('lb-power-input').value = "0";
+      })
+      .catch(err => alert("❌ Gagal memperbarui leaderboard: " + err.message));
+    }
+
+    function renderLeaderboardTable() {
+      const tbody = document.getElementById('leaderboard-table-body');
+      tbody.innerHTML = "";
+
+      if (leaderboardData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 30px;">Belum ada data leaderboard yang dimasukkan.</td></tr>`;
+        return;
+      }
+
+      leaderboardData.forEach((player) => {
+        const tr = document.createElement('tr');
+        const badge = player.rank === 1 ? '🥇 1' : player.rank === 2 ? '🥈 2' : player.rank === 3 ? '🥉 3' : `#${player.rank}`;
+        tr.innerHTML = `
+          <td style="font-weight: bold; font-size: 1.05rem;">${badge}</td>
+          <td style="font-weight: 700; color: #111;">${player.name}</td>
+          <td>${player.camp || '-'}</td>
+          <td style="font-weight: 600; color: var(--primary);">${player.power} Power</td>
+          <td>${isAdminLoggedIn ? `<button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteLeaderboardEntry('${player.id}')">Hapus</button>` : '<span style="color:#666; font-size:0.8rem;">Terverifikasi</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteLeaderboardEntry(docId) {
+      if (confirm("Hapus pemain ini dari leaderboard cloud?")) {
+        db.collection("leaderboard").doc(docId).delete()
+          .then(() => alert("✅ Pemain berhasil dihapus!"))
+          .catch(err => alert("❌ Gagal menghapus: " + err.message));
+      }
+    }
+
+    function checkAdminAuthStatus() {
+      const loginBox = document.getElementById('admin-login-box');
+      const dashBox = document.getElementById('admin-dashboard-box');
+      const adminDeckPublishSec = document.getElementById('admin-deck-publish-section');
+
+      if (isAdminLoggedIn) {
+        loginBox.style.display = 'none';
+        dashBox.style.display = 'block';
+        if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'block';
+        renderAdminTable();
+        renderCampDirectories();
+        renderLeaderboardTable();
+      } else {
+        loginBox.style.display = 'block';
+        dashBox.style.display = 'none';
+        if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
+      }
+    }
+
+    function handleAdminLogin() {
+      const pass = document.getElementById('admin-pass-input').value;
+      if (pass === "Azezax10") {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-pass-input').value = "";
+        checkAdminAuthStatus();
+        alert("✅ Login admin berhasil!");
+      } else {
+        alert("❌ Password salah!");
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdminLoggedIn = false;
+      checkAdminAuthStatus();
+      const adminDeckPublishSec = document.getElementById('admin-deck-publish-section');
+      if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
+      alert("🔒 Berhasil logout dari admin.");
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-table-body');
+      document.getElementById('admin-total-count').textContent = allCards.length;
+      tbody.innerHTML = "";
+
+      allCards.forEach((card, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${card.cardId || '-'}</td>
+          <td style="font-weight:600;">${card.name}</td>
+          <td>${card.set || '-'}</td>
+          <td>${card.power}</td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 2px 8px; font-size:0.75rem;" onclick="editCard(${index})">Edit</button>
+            <button class="btn btn-danger" style="padding: 2px 8px; font-size:0.75rem;" onclick="deleteCard(${index})">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function saveAdminCard() {
+      const editIndex = parseInt(document.getElementById('admin-edit-index').value);
+      const name = document.getElementById('admin-name').value.trim();
+      const cardId = document.getElementById('admin-cardId').value.trim();
+
+      if (!name || !cardId) { alert("⚠️ Nama dan Card ID wajib diisi!"); return; }
+
+      const cardData = {
+        name, cardId,
+        category: document.getElementById('admin-category').value,
+        set: document.getElementById('admin-set').value.trim() || "-",
+        power: document.getElementById('admin-power').value || "0",
+        classId: document.getElementById('admin-classId').value.trim() || "-",
+        role: document.getElementById('admin-role').value.trim() || "-",
+        keyword: document.getElementById('admin-keyword').value.trim() || "",
+        image: document.getElementById('admin-image').value.trim() || "",
+        skill: document.getElementById('admin-skill').value.trim() || "",
+        series: "Custom", illustrator: "-"
+      };
+
+      if (editIndex >= 0) { allCards[editIndex] = cardData; alert("✅ Kartu diperbarui!"); }
+      else { allCards.push(cardData); alert("✅ Kartu ditambahkan!"); }
+
+      saveCardsToStorage();
+      resetAdminForm();
+      renderAdminTable();
+      renderCards(allCards);
+    }
+
+    function editCard(index) {
+      const c = allCards[index];
+      document.getElementById('admin-edit-index').value = index;
+      document.getElementById('admin-form-title').textContent = "Edit: " + c.name;
+      document.getElementById('admin-name').value = c.name;
+      document.getElementById('admin-cardId').value = c.cardId;
+      document.getElementById('admin-category').value = c.category || "Convergence";
+      document.getElementById('admin-set').value = c.set;
+      document.getElementById('admin-power').value = c.power;
+      document.getElementById('admin-classId').value = c.classId;
+      document.getElementById('admin-role').value = c.role;
+      document.getElementById('admin-keyword').value = c.keyword;
+      document.getElementById('admin-image').value = c.image;
+      document.getElementById('admin-skill').value = c.skill;
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function deleteCard(index) {
+      if (confirm("Hapus kartu ini?")) {
+        allCards.splice(index, 1);
+        saveCardsToStorage();
+        renderAdminTable();
+        renderCards(allCards);
+      }
+    }
+
+    function resetAdminForm() {
+      document.getElementById('admin-edit-index').value = "-1";
+      document.getElementById('admin-form-title').textContent = "Tambah Kartu Baru";
+      ['admin-name','admin-cardId','admin-set','admin-classId','admin-role','admin-keyword','admin-image','admin-skill'].forEach(id => document.getElementById(id).value = "");
+      document.getElementById('admin-power').value = "0";
+    }
+
+    function resetToDefaultData() {
+      if (confirm("Reset database ke awal?")) {
+        localStorage.removeItem('renathea_cards_v3');
+        allCards = [...defaultCards];
+        renderAdminTable();
+        renderCards(allCards);
+        alert("✅ Database direset ke bawaan.");
+      }
+    }
+
+    function showModalByCardId(cardId) {
+      const card = allCards.find(c => c.cardId === cardId);
+      if (card) showModal(card);
+    }
+
+    function showModal(card) {
+      document.getElementById('modal-title').textContent = card.name;
+      document.getElementById('modal-id').textContent = card.cardId;
+      const formattedSkill = formatSkillText(card.skill);
+
+      const modalBgStyle = card.image ? `background-image: url('${card.image}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 280px; background-color: #1a1a1a; border-radius: 6px; margin-bottom: 16px;` : '';
+
+      const detailsContainer = document.getElementById('modal-details');
+      detailsContainer.innerHTML = `
+        <div style="grid-column: 1 / -1;">
+          ${card.image ? `<div style="${modalBgStyle}"></div>` : '<div style="text-align:center; color:#888; padding:20px; background:#f0f0f0; margin-bottom:16px; border-radius:6px;">Tidak ada gambar</div>'}
+        </div>
+        <div><label>Kategori</label><p>${card.category || '-'}</p></div>
+        <div><label>Series</label><p>${card.series || '-'}</p></div>
+        <div><label>Nama Set</label><p>${card.set}</p></div>
+        <div><label>Raw Power</label><p>${card.power}</p></div>
+        <div><label>Role</label><p>${card.role || '-'}</p></div>
+        <div><label>Class ID</label><p>${card.classId || '-'}</p></div>
+        <div><label>Keyword</label><p>${card.keyword || '-'}</p></div>
+        <div><label>Ilustrator</label><p>${card.illustrator || '-'}</p></div>
+        <div style="grid-column: 1 / -1;"><label>Skill Deskripsi</label><div class="card-skill-box" style="margin-top:6px;">${formattedSkill || '-'}</div></div>
+      `;
+
+      document.getElementById('card-modal').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('card-modal').classList.remove('active'); }
+
+    // INITIALIZATION
+    listenToCommunityDecks();
+    listenToCampDirectories();
+    listenToCampSchedules();
+    listenToLeaderboard();
+    renderCards(allCards);
+  </script>
+</body>
+</html>
