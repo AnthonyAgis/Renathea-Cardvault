@@ -1566,7 +1566,7 @@
           Discord
         </a>
         <a href="https://tr.ee/IsOjK25ORG" target="_blank" class="btn-contact btn-whatsapp">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12.031 0C5.394 0 0 5.394 0 12.031c0 2.128.553 4.205 1.603 6.03L.211 24l6.096-1.599A11.968 11.968 0,0,0,12.031 24c6.637 0 12.031-5.394 12.031-12.031C24.062 5.394 18.668 0 12.031 0zm0 22.016a9.92 9.92 0,0,1-5.076-1.392l-.364-.216-3.771.99.998-3.676-.237-.377a9.926 9.926 0,0,1-1.519-5.314c0-5.495 4.47-9.965 9.969-9.965 5.495 0 9.969 4.47 9.969 9.965 0 5.495-4.474 9.965-9.969 9.965zm5.467-7.469c-.3-.151-1.776-.877-2.05-.978-.274-.101-.475-.151-.676.151-.201.302-.776.978-.951 1.179-.176.201-.351.226-.652.075-1.345-.632-2.39-1.39-3.267-2.673-.227-.33-.024-.51.127-.66.136-.135.3-.351.451-.527.151-.176.201-.301.301-.502.1-.201.05-.377-.025-.527-.075-.151-.676-1.631-.926-2.233-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.577-.01-.201 0-.526.075-.801.377-.275.301-1.051 1.028-1.051 2.507 0 1.48 1.076 2.913 1.226 3.114.151.201 2.124 3.242 5.143 4.544.718.309 1.278.493 1.716.632.72.228 1.375.195 1.889.118.577-.086 1.776-.726 2.026-1.429.25-.703.25-1.305.175-1.429-.075-.124-.275-.2-.576-.35z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12.031 0C5.394 0 0 5.394 0 12.031c0 2.128.553 4.205 1.603 6.03L.211 24l6.096-1.599A11.968 11.968,0,0,0,12.031 24c6.637 0 12.031-5.394 12.031-12.031C24.062 5.394 18.668 0 12.031 0zm0 22.016a9.92 9.92,0,0,1-5.076-1.392l-.364-.216-3.771.99.998-3.676-.237-.377a9.926 9.926,0,0,1-1.519-5.314c0-5.495 4.47-9.965 9.969-9.965 5.495 0 9.969 4.47 9.969 9.965 0 5.495-4.474 9.965-9.969 9.965zm5.467-7.469c-.3-.151-1.776-.877-2.05-.978-.274-.101-.475-.151-.676.151-.201.302-.776.978-.951 1.179-.176.201-.351.226-.652.075-1.345-.632-2.39-1.39-3.267-2.673-.227-.33-.024-.51.127-.66.136-.135.3-.351.451-.527.151-.176.201-.301.301-.502.1-.201.05-.377-.025-.527-.075-.151-.676-1.631-.926-2.233-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.577-.01-.201 0-.526.075-.801.377-.275.301-1.051 1.028-1.051 2.507 0 1.48 1.076 2.913 1.226 3.114.151.201 2.124 3.242 5.143 4.544.718.309 1.278.493 1.716.632.72.228 1.375.195 1.889.118.577-.086 1.776-.726 2.026-1.429.25-.703.25-1.305.175-1.429-.075-.124-.275-.2-.576-.35z"/></svg>
           Grup WhatsApp
         </a>
         <a href="https://www.instagram.com/playrenathea/?hl=en" target="_blank" class="btn-contact btn-instagram">
@@ -1733,6 +1733,18 @@
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Tilla","image":"","power":"2","role":"","keyword":"POWERUP","skill":"POWERUP (+6).","classId":"P1 - Adventurer","characterId":"Animatherea - Tilla","cardId":"RCS - 071 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Temple of Thales","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Protect lain di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Ward Keeper","characterId":"Animatherea - Millice S.","cardId":"RCS - 072 | Standard","category":"Convergence"}
     ];
+
+    // PENGHUBUNG GAMBAR (MENYESUAIKAN FORMAT NAMA FILE DENGAN SPASI: RCS - 001  Standard.jpg)
+    const folderGambar = 'images'; // Nama folder gambar
+    const ekstensiGambar = '.jpg'; // Format ekstensi (.jpg / .png)
+
+    defaultCards.forEach(card => {
+      if (!card.image) {
+        // Menghapus simbol '|' saja, mempertahankan spasi dan format asli cardId Anda
+        const filenameId = card.cardId.replace('|', '').trim();
+        card.image = `${folderGambar}/${filenameId}${ekstensiGambar}`;
+      }
+    });
 
     let allCards = [...defaultCards];
     let userDeck = [];
@@ -2129,18 +2141,6 @@
       }
     }
 
-    function getShortCodeFromId(cardId) {
-      return cardId.split('|')[0].replace(/\s+/g, '');
-    }
-
-    function getFullIdFromShortCode(shortCode) {
-      const card = allCards.find(c => {
-         const cShort = c.cardId.split('|')[0].replace(/\s+/g, '');
-         return cShort === shortCode;
-      });
-      return card ? card.cardId : null;
-    }
-
     function exportDeckCode() {
       const format = document.getElementById('deck-format-select').value;
       const reqCount = format === 'Origin' ? 9 : 12;
@@ -2150,7 +2150,7 @@
         return;
       }
       
-      const shortCodes = userDeck.map(c => getShortCodeFromId(c.cardId));
+      const shortCodes = userDeck.map(c => c.cardId.replace('|', '').trim());
       const idString = shortCodes.join(',');
       const base64Code = btoa(idString);
 
@@ -2173,32 +2173,26 @@
 
       try {
         const idString = atob(base64Code);
-        const shortCodes = idString.split(',');
+        const codeList = idString.split(',');
 
-        if (shortCodes.length !== 9 && shortCodes.length !== 12) {
+        if (codeList.length !== 9 && codeList.length !== 12) {
           throw new Error("Jumlah kartu tidak valid");
         }
 
-        const formatDetected = shortCodes.length === 12 ? 'Ark' : 'Origin';
+        const formatDetected = codeList.length === 12 ? 'Ark' : 'Origin';
         document.getElementById('deck-format-select').value = formatDetected;
         onFormatChange();
 
         const importedCards = [];
-        for (let i = 0; i < shortCodes.length; i++) {
-          const shortCode = shortCodes[i];
-          const fullId = getFullIdFromShortCode(shortCode);
+        for (let i = 0; i < codeList.length; i++) {
+          const code = codeList[i];
+          const found = allCards.find(c => c.cardId.replace('|', '').trim() === code || c.cardId === code);
           
-          if (!fullId) {
-             const fallbackCard = allCards.find(c => c.cardId === shortCode);
-             if(fallbackCard) {
-                importedCards.push(fallbackCard);
-                continue;
-             }
-             
-            alert(`❌ Kartu dengan kode '${shortCode}' tidak ditemukan di database saat ini.`);
+          if (!found) {
+            alert(`❌ Kartu dengan kode '${code}' tidak ditemukan di database saat ini.`);
             return;
           }
-          importedCards.push(allCards.find(c => c.cardId === fullId));
+          importedCards.push(found);
         }
 
         const classIds = new Set();
@@ -2227,8 +2221,8 @@
       const deck = communityDecks.find(d => d.id === deckId);
       if(!deck) return;
       
-      const shortCodes = deck.cards.map(id => getShortCodeFromId(id));
-      const base64Code = btoa(shortCodes.join(','));
+      const codes = deck.cards.map(id => id.replace('|', '').trim());
+      const base64Code = btoa(codes.join(','));
       
       navigator.clipboard.writeText(base64Code).then(() => {
         alert(`✅ Kode Deck '${deck.name}' berhasil disalin ke Clipboard!\n\n${base64Code}`);
