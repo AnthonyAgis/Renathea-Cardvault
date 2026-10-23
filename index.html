@@ -507,7 +507,6 @@
       font-weight: 600;
     }
 
-    /* MODE DISPLAY SWITCHER FOR DECKBUILDER */
     .view-switch-box {
       display: flex;
       background: #eee;
@@ -535,7 +534,6 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
 
-    /* CONTAINER KHUSUS UNTUK DECKLIST DAN DOWNLOAD GAMBAR */
     .deck-export-container {
       background: #fff;
       padding: 12px;
@@ -551,7 +549,6 @@
       overflow-y: auto;
     }
 
-    /* VISUAL / LIMITLESS GRID VIEW FOR DECKLIST */
     .deck-visual-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1411,6 +1408,22 @@
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
         </div>
 
+        <!-- FEATURE BARU: IMPORT DATABASE KARTU VIA FILE CSV -->
+        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #28a745; background: #f6fff8;">
+          <h3 style="margin-bottom: 10px; color: #1e7e34;">📄 Import Data Kartu via File CSV</h3>
+          <p style="font-size:0.85rem; color:#555; margin-bottom:14px;">Upload file CSV dari Google Sheets / Excel untuk menambah atau memperbarui database kartu secara cepat.</p>
+          
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+            <input type="file" id="csv-file-input" accept=".csv" class="deck-input" style="max-width:320px; margin-bottom:0;" />
+            <select id="csv-import-mode" class="deck-input" style="max-width:200px; margin-bottom:0;">
+              <option value="append">Gabungkan (Append)</option>
+              <option value="overwrite">Timpa Semua (Overwrite)</option>
+            </select>
+            <button class="btn btn-success" onclick="handleCSVImport()">📥 Import Data Kartu</button>
+          </div>
+          <p style="font-size: 0.78rem; color: #777;">*Kolom CSV yang disarankan: <code>name, cardId, category, set, power, classId, role, keyword, skill, image</code></p>
+        </div>
+
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
           <h3 style="margin-bottom: 14px;">🏕️ Tambah / Kelola Renathea Camp Resmi</h3>
           <input type="hidden" id="dir-edit-id" value="">
@@ -1812,8 +1825,8 @@
     let currentTestDeckObj = null;
     let activeDeckFilter = 'all';
     let activeFormatFilter = 'all';
-    let currentDeckViewMode = 'list'; // 'list' or 'visual'
-    let communityDeckViewModes = {}; // Stores view modes per community deck card ID
+    let currentDeckViewMode = 'list'; 
+    let communityDeckViewModes = {};
 
     // MONITOR STATUS AUTHENTICATION FIREBASE
     auth.onAuthStateChanged((user) => {
@@ -2238,7 +2251,6 @@
       }
     }
 
-    // MEMPROSES DOWNLOAD GAMBAR DECKLIST
     function downloadDeckImage() {
       if (userDeck.length === 0) {
         alert("⚠️ Tambahkan minimal 1 kartu ke deck sebelum mengunduh gambar!");
@@ -2255,6 +2267,22 @@
         link.click();
       }).catch(err => {
         alert("⚠️ Gagal membuat gambar decklist: " + err.message);
+      });
+    }
+
+    // DOWNLOAD GAMBAR KHUSUS UNTUK DECK KOMUNITAS
+    function downloadCommunityDeckImage(deckId) {
+      const deckCardArea = document.getElementById(`comm-deck-export-${deckId}`);
+      const deck = communityDecks.find(d => d.id === deckId);
+      if (!deckCardArea || !deck) return;
+
+      html2canvas(deckCardArea, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `${deck.name.replace(/\s+/g, '_')}_Decklist.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        alert("⚠️ Gagal mengunduh gambar deck: " + err.message);
       });
     }
 
@@ -2574,7 +2602,7 @@
         let cardRowsHtml = "";
 
         if (viewMode === 'visual') {
-          cardRowsHtml = `<div class="deck-visual-grid" style="grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; margin-bottom: 12px;">`;
+          cardRowsHtml = `<div id="comm-deck-export-${deck.id}" class="deck-visual-grid" style="grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 240px; overflow-y: auto; margin-bottom: 12px; background: #fff; padding: 6px; border-radius: 6px;">`;
           deck.cards.forEach((cardId, i) => {
             const cardObj = allCards.find(c => c.cardId === cardId);
             const isReserve = (deck.format === 'Ark' && i >= 9);
@@ -2588,7 +2616,7 @@
           });
           cardRowsHtml += `</div>`;
         } else {
-          cardRowsHtml = `<div class="community-card-preview-list">`;
+          cardRowsHtml = `<div id="comm-deck-export-${deck.id}" class="community-card-preview-list" style="background:#fff;">`;
           deck.cards.forEach((cardId, i) => {
             const cardObj = allCards.find(c => c.cardId === cardId);
             const isReserve = (deck.format === 'Ark' && i >= 9);
@@ -2611,7 +2639,7 @@
         
         deckEl.innerHTML = `
           ${isChamp ? '<div class="card-championship-tag" style="top: -12px; left: 16px; bottom: auto;">🏆 Deck Juara Meta</div>' : ''}
-          <div style="margin-top: ${isChamp ? '14px' : '0'}; display:flex; justify-style:space-between; align-items:center;">
+          <div style="margin-top: ${isChamp ? '14px' : '0'}; display:flex; justify-content:space-between; align-items:center;">
             <span class="format-badge ${badgeClass}">${fmt} Format</span>
             <div class="view-switch-box" style="margin-bottom:0; font-size:0.7rem;">
               <button class="view-switch-btn ${viewMode === 'list' ? 'active' : ''}" style="padding:2px 6px;" onclick="toggleCommunityDeckView('${deck.id}', 'list')">📄 List</button>
@@ -2626,6 +2654,7 @@
             <button class="btn btn-primary" style="flex:1; font-size:0.75rem; padding:6px 8px;" onclick="loadDeckToBuilder('${deck.id}')">📂 Muat</button>
             <button class="btn btn-secondary" style="font-size:0.75rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji</button>
             <button class="btn btn-info" style="font-size:0.75rem; padding:6px 8px;" onclick="copyDeckCodeFromCommunity('${deck.id}')">📋 Salin Kode</button>
+            <button class="btn btn-success" style="font-size:0.75rem; padding:6px 8px; flex-basis: 100%; margin-top:4px;" onclick="downloadCommunityDeckImage('${deck.id}')">📷 Download Gambar Deck</button>
             ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.75rem; padding:6px 8px; flex-basis: 100%; margin-top:4px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus Deck (Admin)</button>` : ''}
           </div>
         `;
@@ -3056,6 +3085,99 @@
       auth.signOut().then(() => {
         alert("🔒 Berhasil logout dari admin.");
       });
+    }
+
+    // FUNGSI IMPORT FILE CSV
+    function handleCSVImport() {
+      const fileInput = document.getElementById('csv-file-input');
+      const importMode = document.getElementById('csv-import-mode').value;
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("⚠️ Pilih file CSV terlebih dahulu!");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const parsedCards = parseCSVToCardObjects(text);
+
+        if (parsedCards.length === 0) {
+          alert("❌ File CSV kosong atau format header tidak sesuai!");
+          return;
+        }
+
+        if (importMode === 'overwrite') {
+          if (confirm(`Apakah Anda yakin ingin MENIMPA seluruh database kartu (${allCards.length} kartu) dengan ${parsedCards.length} kartu baru dari CSV?`)) {
+            allCards = parsedCards;
+          } else {
+            return;
+          }
+        } else {
+          allCards = [...allCards, ...parsedCards];
+        }
+
+        allCards.forEach(card => {
+          if (!card.image && card.cardId) {
+            const filenameId = card.cardId.replace('|', '').trim();
+            card.image = `${folderGambar}/${filenameId}${ekstensiGambar}`;
+          }
+        });
+
+        saveCardsToStorage();
+        renderAdminTable();
+        renderCards(allCards);
+        fileInput.value = "";
+        alert(`✅ Berhasil mengimpor ${parsedCards.length} kartu dari CSV!`);
+      };
+
+      reader.readAsText(file);
+    }
+
+    function parseCSVToCardObjects(csvText) {
+      const lines = csvText.split(/\r\n|\n/);
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const results = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // RegEx parser untuk menangani koma di dalam tanda kutip (seperti pada deskripsi skill)
+        const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+        const cleanRow = row.map(cell => cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+
+        const cardObj = {
+          name: "", cardId: "", category: "Convergence", set: "-",
+          power: "0", classId: "-", role: "-", keyword: "", skill: "",
+          image: "", series: "Custom", illustrator: "-"
+        };
+
+        headers.forEach((h, colIdx) => {
+          const val = cleanRow[colIdx] || "";
+          const key = h.toLowerCase();
+
+          if (key === 'name' || key === 'namakartu') cardObj.name = val;
+          else if (key === 'cardid' || key === 'id') cardObj.cardId = val;
+          else if (key === 'category' || key === 'kategori') cardObj.category = val;
+          else if (key === 'set' || key === 'namaset') cardObj.set = val;
+          else if (key === 'power' || key === 'rawpower' || key === 'pwr') cardObj.power = val;
+          else if (key === 'classid' || key === 'class') cardObj.classId = val;
+          else if (key === 'role') cardObj.role = val;
+          else if (key === 'keyword') cardObj.keyword = val;
+          else if (key === 'skill' || key === 'deskripsi') cardObj.skill = val;
+          else if (key === 'image' || key === 'gambar') cardObj.image = val;
+        });
+
+        if (cardObj.name && cardObj.cardId) {
+          results.push(cardObj);
+        }
+      }
+
+      return results;
     }
 
     function renderAdminTable() {
