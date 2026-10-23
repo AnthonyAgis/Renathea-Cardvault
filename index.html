@@ -671,6 +671,19 @@
       border: 2px solid #d4af37;
     }
 
+    .card-championship-tag {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: #d4af37;
+      color: #000;
+      font-weight: 800;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
     .community-deck-title {
       font-size: 1.15rem;
       font-weight: 700;
@@ -1186,10 +1199,10 @@
           </div>
 
           <div id="admin-deck-publish-section" style="display:none; margin-top:16px; padding-top:16px; border-top:2px dashed #d4af37; background:#fffdf5; padding:12px; border-radius:6px;">
-            <h4 style="font-size:0.9rem; color:#8a7300; margin-bottom:8px;">🏆 Publish Deck Juara (Admin)</h4>
+            <h4 style="font-size:0.9rem; color:#8a7300; margin-bottom:8px;">🏆 Publish Deck Turnamen (Admin)</h4>
             <input type="text" id="admin-deck-event-input" class="deck-input" placeholder="Nama Event (Cth: Juara 1 TarCamp)" style="margin-bottom:8px;" />
             <input type="text" id="admin-deck-player-input" class="deck-input" placeholder="Nama Pemain / Pemenang" style="margin-bottom:8px;" />
-            <button class="btn btn-primary" style="width:100%; background:#d4af37; color:#000; font-weight:bold;" onclick="publishAdminChampionshipDeck()">🏆 Simpan sebagai Deck Juara</button>
+            <button class="btn btn-primary" style="width:100%; background:#d4af37; color:#000; font-weight:bold;" onclick="publishAdminChampionshipDeck()">🏆 Simpan sebagai Deck Turnamen</button>
           </div>
           
           <div class="deck-code-section">
@@ -1268,7 +1281,7 @@
       
       <div style="text-align: center; margin-bottom: 24px;">
         <h2 style="color: #111; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 8px;">🏆 Analisis Meta Turnamen Kompetitif</h2>
-        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck pemenang turnamen resmi <span id="meta-format-subtitle" style="font-weight:bold; color:var(--primary);">(Semua Format)</span>.</p>
+        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">Data di bawah ini menganalisis performa dari deck turnamen resmi <span id="meta-format-subtitle" style="font-weight:bold; color:var(--primary);">(Semua Format)</span>.</p>
       </div>
 
       <div class="meta-stats-panel" id="meta-stats-panel">
@@ -1294,7 +1307,8 @@
 
         <span style="font-weight: 600; font-size: 0.9rem; margin-left: 15px;">Tipe:</span>
         <button class="btn btn-secondary" id="filter-all-decks" onclick="setDeckFilter('all')" style="background:var(--primary); color:#fff;">Semua</button>
-        <button class="btn btn-secondary" id="filter-champ-decks" onclick="setDeckFilter('championship')">🏆 Juara Turnamen</button>
+        <!-- PENYESUAIAN NAMA TAB: Juara Turnamen -> Turnamen -->
+        <button class="btn btn-secondary" id="filter-champ-decks" onclick="setDeckFilter('championship')">🏆 Turnamen</button>
         <button class="btn btn-secondary" id="filter-comm-decks" onclick="setDeckFilter('community')">👥 Komunitas</button>
       </div>
 
@@ -1408,7 +1422,6 @@
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
         </div>
 
-        <!-- FEATURE BARU: IMPORT DATABASE KARTU VIA FILE CSV -->
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #28a745; background: #f6fff8;">
           <h3 style="margin-bottom: 10px; color: #1e7e34;">📄 Import Data Kartu via File CSV</h3>
           <p style="font-size:0.85rem; color:#555; margin-bottom:14px;">Upload file CSV dari Google Sheets / Excel untuk menambah atau memperbarui database kartu secara cepat.</p>
@@ -2270,7 +2283,6 @@
       });
     }
 
-    // DOWNLOAD GAMBAR KHUSUS UNTUK DECK KOMUNITAS
     function downloadCommunityDeckImage(deckId) {
       const deckCardArea = document.getElementById(`comm-deck-export-${deckId}`);
       const deck = communityDecks.find(d => d.id === deckId);
@@ -2440,7 +2452,7 @@
 
       db.collection("community_decks").add(newDeck)
         .then(() => {
-          alert("🏆 Deck Juara berhasil dipublikasikan dan masuk Meta Analisis!");
+          alert("🏆 Deck Turnamen berhasil dipublikasikan dan masuk Meta Analisis!");
           document.getElementById('admin-deck-event-input').value = "";
           document.getElementById('admin-deck-player-input').value = "";
           clearDeckForm();
@@ -2450,6 +2462,24 @@
           console.error(err);
           alert("❌ Gagal terhubung ke server cloud! Pastikan Anda sudah login sebagai Admin.");
         });
+    }
+
+    // FEATURE BARU ADMIN: MENGUBAH STATUS DECK KOMUNITAS MENJADI DECK TURNAMEN
+    function toggleChampionshipStatus(deckId, currentStatus) {
+      const newStatus = !currentStatus;
+      const confirmMsg = newStatus 
+        ? "Ubah deck ini menjadi 'Deck Turnamen'? Data kartu di dalamnya akan otomatis dihitung ke dalam Analisis Meta." 
+        : "Kembalikan deck ini menjadi Deck Komunitas biasa?";
+
+      if (confirm(confirmMsg)) {
+        db.collection("community_decks").doc(deckId).update({
+          isChampionship: newStatus
+        })
+        .then(() => {
+          alert("✅ Status deck berhasil diperbarui!");
+        })
+        .catch(err => alert("❌ Gagal memperbarui status: " + err.message));
+      }
     }
 
     function calculateMetaStats() {
@@ -2638,7 +2668,7 @@
         deckEl.className = `community-deck-card ${isChamp ? 'championship-deck-border' : ''}`;
         
         deckEl.innerHTML = `
-          ${isChamp ? '<div class="card-championship-tag" style="top: -12px; left: 16px; bottom: auto;">🏆 Deck Juara Meta</div>' : ''}
+          ${isChamp ? '<div class="card-championship-tag">🏆 Deck Turnamen</div>' : ''}
           <div style="margin-top: ${isChamp ? '14px' : '0'}; display:flex; justify-content:space-between; align-items:center;">
             <span class="format-badge ${badgeClass}">${fmt} Format</span>
             <div class="view-switch-box" style="margin-bottom:0; font-size:0.7rem;">
@@ -2655,7 +2685,13 @@
             <button class="btn btn-secondary" style="font-size:0.75rem; padding:6px 8px;" onclick="openTestDeckModal('${deck.id}')">🧪 Uji</button>
             <button class="btn btn-info" style="font-size:0.75rem; padding:6px 8px;" onclick="copyDeckCodeFromCommunity('${deck.id}')">📋 Salin Kode</button>
             <button class="btn btn-success" style="font-size:0.75rem; padding:6px 8px; flex-basis: 100%; margin-top:4px;" onclick="downloadCommunityDeckImage('${deck.id}')">📷 Download Gambar Deck</button>
-            ${isAdminLoggedIn ? `<button class="btn btn-danger" style="font-size:0.75rem; padding:6px 8px; flex-basis: 100%; margin-top:4px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus Deck (Admin)</button>` : ''}
+            
+            ${isAdminLoggedIn ? `
+              <button class="btn" style="font-size:0.75rem; padding:6px 8px; flex:1; margin-top:4px; background:#d4af37; color:#000; font-weight:bold;" onclick="toggleChampionshipStatus('${deck.id}', ${isChamp})">
+                ${isChamp ? '👥 Kembalikan ke Biasa' : '🏆 Jadikan Deck Turnamen'}
+              </button>
+              <button class="btn btn-danger" style="font-size:0.75rem; padding:6px 8px; flex:1; margin-top:4px;" onclick="deleteCommunityDeck('${deck.id}')">🗑️ Hapus Deck</button>
+            ` : ''}
           </div>
         `;
         grid.appendChild(deckEl);
@@ -3059,6 +3095,7 @@
         dashBox.style.display = 'none';
         if (adminDeckPublishSec) adminDeckPublishSec.style.display = 'none';
       }
+      renderCommunityDecks();
     }
 
     function handleAdminLogin() {
@@ -3087,7 +3124,6 @@
       });
     }
 
-    // FUNGSI IMPORT FILE CSV
     function handleCSVImport() {
       const fileInput = document.getElementById('csv-file-input');
       const importMode = document.getElementById('csv-import-mode').value;
@@ -3146,7 +3182,6 @@
         const line = lines[i].trim();
         if (!line) continue;
 
-        // RegEx parser untuk menangani koma di dalam tanda kutip (seperti pada deskripsi skill)
         const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
         const cleanRow = row.map(cell => cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 
