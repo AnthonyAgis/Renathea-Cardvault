@@ -1096,13 +1096,13 @@
               <option value="Exclusive">Exclusive</option>
               <option value="Promotion">Promotion</option>
               <option value="Convergence">Convergence</option>
+              <option value="Collaboration">Collaboration</option>
             </select>
           </div>
           <div class="search-input-group">
             <label for="set-select">Nama Set</label>
             <select id="set-select" onchange="applyFilters('search')">
               <option value="">Semua Set</option>
-              <option value="-">- (Promo/Exclusive)</option>
               <option value="In_Sans_">In_Sans_</option>
               <option value="Jolly Robin">Jolly Robin</option>
               <option value="Sol Mortuus">Sol Mortuus</option>
@@ -1229,13 +1229,13 @@
                   <option value="Exclusive">Exclusive</option>
                   <option value="Promotion">Promotion</option>
                   <option value="Convergence">Convergence</option>
+                  <option value="Collaboration">Collaboration</option>
                 </select>
               </div>
               <div class="search-input-group">
                 <label for="deck-set-select">Nama Set</label>
                 <select id="deck-set-select" onchange="applyFilters('deck')">
                   <option value="">Semua Set</option>
-                  <option value="-">- (Promo/Exclusive)</option>
                   <option value="In_Sans_">In_Sans_</option>
                   <option value="Jolly Robin">Jolly Robin</option>
                   <option value="Sol Mortuus">Sol Mortuus</option>
@@ -1539,6 +1539,7 @@
                   <option value="Convergence">Convergence</option>
                   <option value="Exclusive">Exclusive</option>
                   <option value="Promotion">Promotion</option>
+                  <option value="Collaboration">Collaboration</option>
                 </select>
               </div>
               <div class="admin-form-group" style="flex:1;">
@@ -1717,22 +1718,22 @@
     const auth = firebase.auth();
 
     const defaultCards = [
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Damar Jati","image":"","power":"7","role":"","keyword":"SILENCE, PROTECT","skill":"SILENCE semua kartu di Arena kamu! | PROTECT semua kartu di Arena lawan!","classId":"P1 - Prisoner","characterId":"Tankcell - Fajri","cardId":"TCS - 003 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Game Director","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu di seluruh Arena!","classId":"P1 - Warlock","characterId":"Tankcell - Adnan","cardId":"TCS - 004 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Community Director","image":"","power":"0","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9).","classId":"P1 - Ranger","characterId":"Tankcell - Dika","cardId":"TCS - 005 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Officer","image":"","power":"5","role":"Tank","keyword":"","skill":"","classId":"P1 - Sentinel","characterId":"Tankcell - Fajri","cardId":"TCS - 006 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Agis","name":"Sayuti Koboi Betawi","image":"","power":"3","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Gunslinger","characterId":"Betawi - Sayuti","cardId":"FTR - 001 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Agis","name":"Perkasa Form 1","image":"","power":"4","role":"Melee","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Brawler","characterId":"Perkasa - Form 1","cardId":"FTR - 002 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Agis","name":"Savopuma Bersaudara","image":"","power":"2","role":"Support","keyword":"POWERUP","skill":"POWERUP (+2) per tiap kartu di Arena kamu.","classId":"P2 - Twins","characterId":"Savo - Puma","cardId":"FTR - 003 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Agis","name":"Kodok Burik Dewasa","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Toad","characterId":"Kodok - Burik","cardId":"FTR - 004 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Agis","name":"Healer","image":"","power":"0","role":"Support","keyword":"PROTECT","skill":"PROTECT kartu di Arena kamu!","classId":"P1 - Medic","characterId":"Support - Healer","cardId":"FTR - 005 | Promotion","category":"Promotion"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Ambarwati","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Jagad Raya - Ambarwati","cardId":"JRE - 01 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Mutiara","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Jagad Raya - Mutiara","cardId":"JRE - 02 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Nayra","image":"","power":"0","role":"Magic","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lain di seluruh Arena! | POWERUP (+2).","classId":"P1 - Sorceress","characterId":"Basundara - Nayra","cardId":"AQR - 01 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Bayu","image":"","power":"2","role":"Agility","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Scout","characterId":"Basundara - Bayu","cardId":"AQR - 02 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Nov","name":"Nova","image":"","power":"3","role":"Magic | Ranged","keyword":"POWERUP, SILENCE","skill":"POWERUP (+5). | SILENCE kartu lawan!","classId":"P2 - Star Mage","characterId":"Nov - Nova","cardId":"NOV - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Ignatia L (Chronu)","name":"Damar Jati","image":"","power":"7","role":"","keyword":"SILENCE, PROTECT","skill":"SILENCE semua kartu di Arena kamu! | PROTECT semua kartu di Arena lawan!","classId":"P1 - Prisoner","characterId":"Tankcell - Fajri","cardId":"TCS - 003 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Ignatia L (Chronu)","name":"Game Director","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu di seluruh Arena!","classId":"P1 - Warlock","characterId":"Tankcell - Adnan","cardId":"TCS - 004 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Ignatia L (Chronu)","name":"Community Director","image":"","power":"0","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9).","classId":"P1 - Ranger","characterId":"Tankcell - Dika","cardId":"TCS - 005 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Ignatia L (Chronu)","name":"Officer","image":"","power":"5","role":"Tank","keyword":"","skill":"","classId":"P1 - Sentinel","characterId":"Tankcell - Fajri","cardId":"TCS - 006 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Agis","name":"Sayuti Koboi Betawi","image":"","power":"3","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Gunslinger","characterId":"Betawi - Sayuti","cardId":"FTR - 001 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Agis","name":"Perkasa Form 1","image":"","power":"4","role":"Melee","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Brawler","characterId":"Perkasa - Form 1","cardId":"FTR - 002 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Agis","name":"Savopuma Bersaudara","image":"","power":"2","role":"Support","keyword":"POWERUP","skill":"POWERUP (+2) per tiap kartu di Arena kamu.","classId":"P2 - Twins","characterId":"Savo - Puma","cardId":"FTR - 003 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Agis","name":"Kodok Burik Dewasa","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Toad","characterId":"Kodok - Burik","cardId":"FTR - 004 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"Promotion","illustrator":"Agis","name":"Healer","image":"","power":"0","role":"Support","keyword":"PROTECT","skill":"PROTECT kartu di Arena kamu!","classId":"P1 - Medic","characterId":"Support - Healer","cardId":"FTR - 005 | Promotion","category":"Promotion"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Jagad Raya","name":"Ambarwati","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Jagad Raya - Ambarwati","cardId":"JRE - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Jagad Raya","name":"Mutiara","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Jagad Raya - Mutiara","cardId":"JRE - 02 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"aQar Studio","name":"Nayra","image":"","power":"0","role":"Magic","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lain di seluruh Arena! | POWERUP (+2).","classId":"P1 - Sorceress","characterId":"Basundara - Nayra","cardId":"AQR - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"aQar Studio","name":"Bayu","image":"","power":"2","role":"Agility","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Scout","characterId":"Basundara - Bayu","cardId":"AQR - 02 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Nov","name":"Nova","image":"","power":"3","role":"Magic | Ranged","keyword":"POWERUP, SILENCE","skill":"POWERUP (+5). | SILENCE kartu lawan!","classId":"P2 - Star Mage","characterId":"Nov - Nova","cardId":"NOV - 01 | Exclusive","category":"Exclusive"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Prabu Siliwangi","image":"","power":"3","role":"Tank | Support","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu yang Raw Power-nya terbesar di Arena kamu! | POWERUP (+3) jika kartu ini punya Raw Power terbesar di Arena Kamu>","classId":"P2 - Honor Guard","characterId":"In_Sans_ - Siliwangi","cardId":"RCS - 001 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Kian Santang","image":"","power":"3","role":"Melee","keyword":"POWERUP, SILENCE","skill":"POWERUP (+4) per tiap Melee di Arena lawan. | SILENCE Melee di Arena Lawan!","classId":"P1 - Slugger","characterId":"In_Sans_ - Kian Santang","cardId":"RCS - 002 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Surawisesa","image":"","power":"2","role":"Agility","keyword":"SILENCE, POWERUP","skill":"SILENCE Magic dan Support di Arena Lawan! | POWERUP (+2) per tiap Magic atau Support di Arena lawan.","classId":"P1 - Spellbane","characterId":"In_Sans_ - Surawisesa","cardId":"RCS - 003 | Standard","category":"Convergence"},
@@ -1783,7 +1784,7 @@
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Afda Tri","illustrator":"Afda Trihatma","name":"Taurus","image":"","power":"2","role":"Magic | Melee","keyword":"LAW","skill":"LAW: TIDAK ada skill Powerup.","classId":"P2 - Battlemage","characterId":"Afda Tri - Taurus","cardId":"RCS - 048 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Mosquito Man","image":"","power":"2","role":"Agility | Magic","keyword":"SILENCE","skill":"SILENCE Ranged dan Melee di Arena lawan!","classId":"P1 - Shadow","characterId":"Comolo - Mosquito Man","cardId":"RCS - 049 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"The Huntress","image":"","power":"2","role":"Agility | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu yang Raw Power-nya terkecil di Arena lawan! | POWERUP (+X). | X = Raw Power terbesar di Arena lawan.","classId":"P2 - Swashbuckler","characterId":"Comolo - The Huntress","cardId":"RCS - 050 | Standard","category":"Convergence"},
-      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Barong","image":"","power":"4","role":"Tank | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu yang Raw Power-nya terbesar di Arena lawan! | POWERUP (+X). | X = Raw Power terkecil di Arena lawan.","classId":"P2 - Dreadnought","characterId":"Comolo - Barong","cardId":"RCS - 051 | Standard","category":"Convergence"},
+      {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Barong","image":"","power":"4","role":"Tank | Melee","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu yang Raw Power-nya terbesar di Arena lawan! | POWERUP (+X). | X = Raw Power terkecil di Arena kamu.","classId":"P2 - Dreadnought","characterId":"Comolo - Barong","cardId":"RCS - 051 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Zinaida","image":"","power":"1","role":"Support","keyword":"PROTECT","skill":"PROTECT kartu yang Raw Power-nya genap di Arena Kamu!","classId":"P1 - Evenkeeper","characterId":"Comolo - Zinaida","cardId":"RCS - 052 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Gasman","image":"","power":"3","role":"Melee","keyword":"SILENCE, POWERUP","skill":"Jika ada Melee lain di Arena kamu, SILENCE semua kartu di Arena kamu! | POWERUP (+5).","classId":"P1 - Rival","characterId":"Comolo - Gasman","cardId":"RCS - 053 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Comolo","illustrator":"Muhammad Amin","name":"Mo5es","image":"","power":"1","role":"Support | Magic","keyword":"LAW, POWERUP","skill":"LAW: Semua nilai Powerup (+?) berubah menjadi (+3), teks lainnya tetap sama. | POWERUP (+0) per tiap kartu di Arena kamu.","classId":"P2 - Artificer","characterId":"Comolo - Mo5es","cardId":"RCS - 054 | Standard","category":"Convergence"},
@@ -1805,20 +1806,20 @@
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Thinis Necro","image":"","power":"0","role":"Ranged | Magic","keyword":"POWERUP, SILENCE","skill":"POWERUP (+10). | SILENCE kartu ini!","classId":"P1 - Spellshot","characterId":"Animatherea - Thinis E.","cardId":"RCS - 070 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Tilla","image":"","power":"2","role":"","keyword":"POWERUP","skill":"POWERUP (+6).","classId":"P1 - Adventurer","characterId":"Animatherea - Tilla","cardId":"RCS - 071 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"Animatherea","illustrator":"Jessica Amelia","name":"Temple of Thales","image":"","power":"2","role":"Support | Tank","keyword":"PROTECT","skill":"Jika ada skill Protect lain di Arena kamu, PROTECT semua kartu di Arena kamu!","classId":"P1 - Ward Keeper","characterId":"Animatherea - Millice S.","cardId":"RCS - 072 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Jordan","image":"","power":"2","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+3).","classId":"P1 - Striker","characterId":"Collab - Jordan","cardId":"NOV - 002 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Raka","image":"","power":"1","role":"Agility","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Runner","characterId":"Collab - Raka","cardId":"NOV - 003 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Yosua","image":"","power":"3","role":"Tank","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Wall","characterId":"Collab - Yosua","cardId":"NOV - 004 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Wayan","image":"","power":"2","role":"Support","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu di Arena kamu! | POWERUP (+2).","classId":"P1 - Helper","characterId":"Collab - Wayan","cardId":"NOV - 005 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Kai","image":"","power":"1","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Shooter","characterId":"Collab - Kai","cardId":"NOV - 006 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Axel","image":"","power":"3","role":"Melee | Agility","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lawan! | POWERUP (+2).","classId":"P2 - Speedster","characterId":"Collab - Axel","cardId":"NOV - 007 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Oruro","image":"","power":"0","role":"Magic","keyword":"SILENCE","skill":"SILENCE semua kartu di Arena lawan!","classId":"P1 - Mage","characterId":"Collab - Oruro","cardId":"NOV - 008 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Erlang","image":"","power":"4","role":"Tank | Melee","keyword":"PROTECT","skill":"PROTECT semua kartu di Arena kamu!","classId":"P2 - Defender","characterId":"Collab - Erlang","cardId":"NOV - 009 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Jala","image":"","power":"1","role":"Support | Ranged","keyword":"POWERUP","skill":"POWERUP (+3).","classId":"P2 - Support","characterId":"Collab - Jala","cardId":"NOV - 010 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Tirtha","image":"","power":"2","role":"Magic | Support","keyword":"LAW","skill":"LAW: TIDAK ada skill Silence.","classId":"P2 - Purifier","characterId":"Collab - Tirtha","cardId":"NOV - 011 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Tepan","image":"","power":"2","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+5).","classId":"P1 - Fighter","characterId":"Collab - Tepan","cardId":"NOV - 012 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Raga","image":"","power":"3","role":"Tank","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu di Arena kamu! | POWERUP (+2).","classId":"P1 - Guardian","characterId":"Collab - Raga","cardId":"NOV - 013 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Reno","image":"","power":"1","role":"Agility","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Assassin","characterId":"Collab - Reno","cardId":"NOV - 014 | Standard","category":"Convergence"},
-      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Yoga","image":"","power":"2","role":"Magic","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Sorcerer","characterId":"Collab - Yoga","cardId":"NOV - 015 | Standard","category":"Convergence"}
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Jordan","image":"","power":"2","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+3).","classId":"P1 - Striker","characterId":"Collab - Jordan","cardId":"NOV - 002 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Raka","image":"","power":"1","role":"Agility","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Runner","characterId":"Collab - Raka","cardId":"NOV - 003 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Yosua","image":"","power":"3","role":"Tank","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Wall","characterId":"Collab - Yosua","cardId":"NOV - 004 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Wayan","image":"","power":"2","role":"Support","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu di Arena kamu! | POWERUP (+2).","classId":"P1 - Helper","characterId":"Collab - Wayan","cardId":"NOV - 005 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Kai","image":"","power":"1","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Shooter","characterId":"Collab - Kai","cardId":"NOV - 006 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Axel","image":"","power":"3","role":"Melee | Agility","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lawan! | POWERUP (+2).","classId":"P2 - Speedster","characterId":"Collab - Axel","cardId":"NOV - 007 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Oruro","image":"","power":"0","role":"Magic","keyword":"SILENCE","skill":"SILENCE semua kartu di Arena lawan!","classId":"P1 - Mage","characterId":"Collab - Oruro","cardId":"NOV - 008 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Erlang","image":"","power":"4","role":"Tank | Melee","keyword":"PROTECT","skill":"PROTECT semua kartu di Arena kamu!","classId":"P2 - Defender","characterId":"Collab - Erlang","cardId":"NOV - 009 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Jala","image":"","power":"1","role":"Support | Ranged","keyword":"POWERUP","skill":"POWERUP (+3).","classId":"P2 - Support","characterId":"Collab - Jala","cardId":"NOV - 010 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Tirtha","image":"","power":"2","role":"Magic | Support","keyword":"LAW","skill":"LAW: TIDAK ada skill Silence.","classId":"P2 - Purifier","characterId":"Collab - Tirtha","cardId":"NOV - 011 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Tepan","image":"","power":"2","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+5).","classId":"P1 - Fighter","characterId":"Collab - Tepan","cardId":"NOV - 012 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Raga","image":"","power":"3","role":"Tank","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu di Arena kamu! | POWERUP (+2).","classId":"P1 - Guardian","characterId":"Collab - Raga","cardId":"NOV - 013 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Reno","image":"","power":"1","role":"Agility","keyword":"SILENCE","skill":"SILENCE kartu lawan!","classId":"P1 - Assassin","characterId":"Collab - Reno","cardId":"NOV - 014 | Standard","category":"Collaboration"},
+      {"sourceTab":"Collaboration Series","series":"Collaboration Series","set":"READY SET GO!","illustrator":"Nov","name":"Yoga","image":"","power":"2","role":"Magic","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Sorcerer","characterId":"Collab - Yoga","cardId":"NOV - 015 | Standard","category":"Collaboration"}
     ];
 
     const folderGambar = 'images';
@@ -1831,11 +1832,11 @@
       }
     });
 
-    let savedCards = localStorage.getItem('renathea_cards_v5');
+    let savedCards = localStorage.getItem('renathea_cards_v6');
     let allCards = savedCards ? JSON.parse(savedCards) : [...defaultCards];
 
     function saveCardsToStorage() {
-      localStorage.setItem('renathea_cards_v5', JSON.stringify(allCards));
+      localStorage.setItem('renathea_cards_v6', JSON.stringify(allCards));
     }
 
     let userDeck = [];
@@ -1850,7 +1851,6 @@
     let currentDeckViewMode = 'list'; 
     let communityDeckViewModes = {};
 
-    // MONITOR STATUS AUTHENTICATION FIREBASE
     auth.onAuthStateChanged((user) => {
       if (user) {
         isAdminLoggedIn = true;
@@ -3217,7 +3217,7 @@
 
     function resetToDefaultData() {
       if (confirm("Reset database ke awal?")) {
-        localStorage.removeItem('renathea_cards_v5');
+        localStorage.removeItem('renathea_cards_v6');
         allCards = [...defaultCards];
         renderAdminTable();
         renderCards(allCards);
