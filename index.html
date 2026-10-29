@@ -1307,7 +1307,6 @@
 
         <span style="font-weight: 600; font-size: 0.9rem; margin-left: 15px;">Tipe:</span>
         <button class="btn btn-secondary" id="filter-all-decks" onclick="setDeckFilter('all')" style="background:var(--primary); color:#fff;">Semua</button>
-        <!-- PENYESUAIAN NAMA TAB: Juara Turnamen -> Turnamen -->
         <button class="btn btn-secondary" id="filter-champ-decks" onclick="setDeckFilter('championship')">🏆 Turnamen</button>
         <button class="btn btn-secondary" id="filter-comm-decks" onclick="setDeckFilter('community')">👥 Komunitas</button>
       </div>
@@ -1420,21 +1419,6 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h2>Panel Pengelola Admin</h2>
           <button class="btn btn-secondary" onclick="handleAdminLogout()">🔒 Logout Admin</button>
-        </div>
-
-        <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid #28a745; background: #f6fff8;">
-          <h3 style="margin-bottom: 10px; color: #1e7e34;">📄 Import Data Kartu via File CSV</h3>
-          <p style="font-size:0.85rem; color:#555; margin-bottom:14px;">Upload file CSV dari Google Sheets / Excel untuk menambah atau memperbarui database kartu secara cepat.</p>
-          
-          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-            <input type="file" id="csv-file-input" accept=".csv" class="deck-input" style="max-width:320px; margin-bottom:0;" />
-            <select id="csv-import-mode" class="deck-input" style="max-width:200px; margin-bottom:0;">
-              <option value="append">Gabungkan (Append)</option>
-              <option value="overwrite">Timpa Semua (Overwrite)</option>
-            </select>
-            <button class="btn btn-success" onclick="handleCSVImport()">📥 Import Data Kartu</button>
-          </div>
-          <p style="font-size: 0.78rem; color: #777;">*Kolom CSV yang disarankan: <code>name, cardId, category, set, power, classId, role, keyword, skill, image</code></p>
         </div>
 
         <div class="search-panel" style="margin-bottom: 30px; border-left: 5px solid var(--primary);">
@@ -1729,15 +1713,22 @@
     const auth = firebase.auth();
 
     const defaultCards = [
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Damar Jati","image":"","power":"7","role":"","keyword":"SILENCE, PROTECT","skill":"SILENCE semua kartu di Arena kamu! | PROTECT semua kartu di Arena lawan!","classId":"P1 - Prisoner","characterId":"Tankcell - Fajri","cardId":"TCS - 003 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Game Director","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu di seluruh Arena!","classId":"P1 - Warlock","characterId":"Tankcell - Adnan","cardId":"TCS - 004 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Community Director","image":"","power":"0","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9).","classId":"P1 - Ranger","characterId":"Tankcell - Dika","cardId":"TCS - 005 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promo","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Officer","image":"","power":"5","role":"Tank","keyword":"","skill":"","classId":"P1 - Sentinel","characterId":"Tankcell - Fajri","cardId":"TCS - 006 | Promotion","category":"Promotion"},
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Ambarwati","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Jagad Raya - Ambarwati","cardId":"JRE - 01 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Mutiara","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Jagad Raya - Mutiara","cardId":"JRE - 02 | Exclusive","category":"Exclusive"},
-      {"sourceTab":"Promo","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Nayra","image":"","power":"0","role":"Magic","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lain di seluruh Arena! | POWERUP (+2).","classId":"P1 - Sorceress","characterId":"Basundara - Nayra","cardId":"AQR - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Skad Tairio","image":"","power":"0","role":"Support | Ranged","keyword":"COPY","skill":"COPY skill Powerup di Arena kamu.","classId":"P2 - Bard","characterId":"Tankcell - Dika","cardId":"TCS - 002 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Damar Jati","image":"","power":"7","role":"","keyword":"SILENCE, PROTECT","skill":"SILENCE semua kartu di Arena kamu! | PROTECT semua kartu di Arena lawan!","classId":"P1 - Prisoner","characterId":"Tankcell - Fajri","cardId":"TCS - 003 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Game Director","image":"","power":"1","role":"Magic","keyword":"SILENCE","skill":"SILENCE kartu di seluruh Arena!","classId":"P1 - Warlock","characterId":"Tankcell - Adnan","cardId":"TCS - 004 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Community Director","image":"","power":"0","role":"Ranged","keyword":"POWERUP","skill":"POWERUP (+9).","classId":"P1 - Ranger","characterId":"Tankcell - Dika","cardId":"TCS - 005 | Promotion","category":"Promotion"},
+      {"sourceTab":"Promotion Card","series":"Promotion Card","set":"-","illustrator":"Ignatia L (Chronu)","name":"Officer","image":"","power":"5","role":"Tank","keyword":"","skill":"","classId":"P1 - Sentinel","characterId":"Tankcell - Fajri","cardId":"TCS - 006 | Promotion","category":"Promotion"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Ambarwati","image":"","power":"1","role":"Magic","keyword":"LAW","skill":"LAW: Kartu yang ter-protect TIDAK dapat mengaktifkan skill Powerup.","classId":"P2 - Shadow Mage","characterId":"Jagad Raya - Ambarwati","cardId":"JRE - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"Jagad Raya","name":"Mutiara","image":"","power":"0","role":"Support","keyword":"LAW, POWERUP","skill":"LAW: TIDAK ada skill Silence. | POWERUP (+3) per tiap skill Protect di seluruh Arena.","classId":"P2 - Bishop","characterId":"Jagad Raya - Mutiara","cardId":"JRE - 02 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Nayra","image":"","power":"0","role":"Magic","keyword":"SILENCE, POWERUP","skill":"SILENCE kartu lain di seluruh Arena! | POWERUP (+2).","classId":"P1 - Sorceress","characterId":"Basundara - Nayra","cardId":"AQR - 01 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Kancil","image":"","power":"1","role":"Agility","keyword":"POWERUP","skill":"POWERUP (+4).","classId":"P1 - Trickster","characterId":"Basundara - Kancil","cardId":"AQR - 02 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Garuda","image":"","power":"5","role":"Melee | Support","keyword":"PROTECT","skill":"PROTECT kartu lain di Arena kamu!","classId":"P2 - Protector","characterId":"Basundara - Garuda","cardId":"AQR - 03 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Naga Basundara","image":"","power":"4","role":"Tank | Magic","keyword":"SILENCE","skill":"SILENCE semua kartu di Arena lawan!","classId":"P2 - Dragon Lord","characterId":"Basundara - Naga","cardId":"AQR - 04 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Dewi Sri","image":"","power":"0","role":"Support","keyword":"PROTECT, POWERUP","skill":"PROTECT semua kartu di Arena kamu! | POWERUP (+5).","classId":"P1 - Goddess","characterId":"Basundara - Dewi Sri","cardId":"AQR - 05 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Sangkuriang","image":"","power":"3","role":"Melee","keyword":"POWERUP","skill":"POWERUP (+6) jika kartu ini punya Raw Power terbesar di Arena kamu.","classId":"P1 - Hero","characterId":"Basundara - Sangkuriang","cardId":"AQR - 06 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Dayang Sumbi","image":"","power":"1","role":"Magic | Support","keyword":"LAW","skill":"LAW: Semua skill Protect dibatalkan.","classId":"P2 - Weaver","characterId":"Basundara - Dayang Sumbi","cardId":"AQR - 07 | Exclusive","category":"Exclusive"},
+      {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"-","illustrator":"aQar Studio","name":"Tumang","image":"","power":"2","role":"Tank | Agility","keyword":"PROTECT","skill":"PROTECT kartu ini!","classId":"P1 - Hound","characterId":"Basundara - Tumang","cardId":"AQR - 08 | Exclusive","category":"Exclusive"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Prabu Siliwangi","image":"","power":"3","role":"Tank | Support","keyword":"PROTECT, POWERUP","skill":"PROTECT kartu yang Raw Power-nya terbesar di Arena kamu! | POWERUP (+3) jika kartu ini punya Raw Power terbesar di Arena Kamu>","classId":"P2 - Honor Guard","characterId":"In_Sans_ - Siliwangi","cardId":"RCS - 001 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Kian Santang","image":"","power":"3","role":"Melee","keyword":"POWERUP, SILENCE","skill":"POWERUP (+4) per tiap Melee di Arena lawan. | SILENCE Melee di Arena Lawan!","classId":"P1 - Slugger","characterId":"In_Sans_ - Kian Santang","cardId":"RCS - 002 | Standard","category":"Convergence"},
       {"sourceTab":"Convergence Series","series":"Convergence Series","set":"In_Sans_","illustrator":"Insan Fadilah","name":"Surawisesa","image":"","power":"2","role":"Agility","keyword":"SILENCE, POWERUP","skill":"SILENCE Magic dan Support di Arena Lawan! | POWERUP (+2) per tiap Magic atau Support di Arena lawan.","classId":"P1 - Spellbane","characterId":"In_Sans_ - Surawisesa","cardId":"RCS - 003 | Standard","category":"Convergence"},
@@ -1822,11 +1813,11 @@
       }
     });
 
-    let savedCards = localStorage.getItem('renathea_cards_v3');
+    let savedCards = localStorage.getItem('renathea_cards_v4');
     let allCards = savedCards ? JSON.parse(savedCards) : [...defaultCards];
 
     function saveCardsToStorage() {
-      localStorage.setItem('renathea_cards_v3', JSON.stringify(allCards));
+      localStorage.setItem('renathea_cards_v4', JSON.stringify(allCards));
     }
 
     let userDeck = [];
@@ -2464,7 +2455,6 @@
         });
     }
 
-    // FEATURE BARU ADMIN: MENGUBAH STATUS DECK KOMUNITAS MENJADI DECK TURNAMEN
     function toggleChampionshipStatus(deckId, currentStatus) {
       const newStatus = !currentStatus;
       const confirmMsg = newStatus 
@@ -3124,97 +3114,6 @@
       });
     }
 
-    function handleCSVImport() {
-      const fileInput = document.getElementById('csv-file-input');
-      const importMode = document.getElementById('csv-import-mode').value;
-      const file = fileInput.files[0];
-
-      if (!file) {
-        alert("⚠️ Pilih file CSV terlebih dahulu!");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const parsedCards = parseCSVToCardObjects(text);
-
-        if (parsedCards.length === 0) {
-          alert("❌ File CSV kosong atau format header tidak sesuai!");
-          return;
-        }
-
-        if (importMode === 'overwrite') {
-          if (confirm(`Apakah Anda yakin ingin MENIMPA seluruh database kartu (${allCards.length} kartu) dengan ${parsedCards.length} kartu baru dari CSV?`)) {
-            allCards = parsedCards;
-          } else {
-            return;
-          }
-        } else {
-          allCards = [...allCards, ...parsedCards];
-        }
-
-        allCards.forEach(card => {
-          if (!card.image && card.cardId) {
-            const filenameId = card.cardId.replace('|', '').trim();
-            card.image = `${folderGambar}/${filenameId}${ekstensiGambar}`;
-          }
-        });
-
-        saveCardsToStorage();
-        renderAdminTable();
-        renderCards(allCards);
-        fileInput.value = "";
-        alert(`✅ Berhasil mengimpor ${parsedCards.length} kartu dari CSV!`);
-      };
-
-      reader.readAsText(file);
-    }
-
-    function parseCSVToCardObjects(csvText) {
-      const lines = csvText.split(/\r\n|\n/);
-      if (lines.length < 2) return [];
-
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      const results = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-
-        const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-        const cleanRow = row.map(cell => cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-
-        const cardObj = {
-          name: "", cardId: "", category: "Convergence", set: "-",
-          power: "0", classId: "-", role: "-", keyword: "", skill: "",
-          image: "", series: "Custom", illustrator: "-"
-        };
-
-        headers.forEach((h, colIdx) => {
-          const val = cleanRow[colIdx] || "";
-          const key = h.toLowerCase();
-
-          if (key === 'name' || key === 'namakartu') cardObj.name = val;
-          else if (key === 'cardid' || key === 'id') cardObj.cardId = val;
-          else if (key === 'category' || key === 'kategori') cardObj.category = val;
-          else if (key === 'set' || key === 'namaset') cardObj.set = val;
-          else if (key === 'power' || key === 'rawpower' || key === 'pwr') cardObj.power = val;
-          else if (key === 'classid' || key === 'class') cardObj.classId = val;
-          else if (key === 'role') cardObj.role = val;
-          else if (key === 'keyword') cardObj.keyword = val;
-          else if (key === 'skill' || key === 'deskripsi') cardObj.skill = val;
-          else if (key === 'image' || key === 'gambar') cardObj.image = val;
-        });
-
-        if (cardObj.name && cardObj.cardId) {
-          results.push(cardObj);
-        }
-      }
-
-      return results;
-    }
-
     function renderAdminTable() {
       const tbody = document.getElementById('admin-table-body');
       document.getElementById('admin-total-count').textContent = allCards.length;
@@ -3300,7 +3199,7 @@
 
     function resetToDefaultData() {
       if (confirm("Reset database ke awal?")) {
-        localStorage.removeItem('renathea_cards_v3');
+        localStorage.removeItem('renathea_cards_v4');
         allCards = [...defaultCards];
         renderAdminTable();
         renderCards(allCards);
