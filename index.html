@@ -1704,20 +1704,8 @@
   </div>
 
   <script>
-    // FIREBASE CONFIG LENGKAP
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkBN6Ezrekc_1VMiQlwPjpS40wHOH5YnM",
-      authDomain: "renathea-cardvault.firebaseapp.com",
-      projectId: "renathea-cardvault",
-      storageBucket: "renathea-cardvault.firebasestorage.app",
-      messagingSenderId: "792334995299",
-      appId: "1:792334995299:web:a90fc681372dde06180d56",
-      measurementId: "G-RPGK6VVKT4"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+    // FIREBASE CONFIG dimuat dari /api/firebase-config (lihat initFirebase)
+    let db, auth;
 
     const defaultCards = [
       {"sourceTab":"Exclusive Card","series":"Exclusive Card","set":"Exclusive","illustrator":"Ignatia L (Chronu)","name":"Halluttaforas","image":"","power":"2","role":"","keyword":"PASSIVE, POWERUP","skill":"PASSIVE: Kartu ini punya role yang TIDAK dimiliki kartu lain di Arena kamu. | POWERUP (+10) jika kartu ini TIDAK punya role","classId":"P2 - Generalist","characterId":"Tankcell - Adnan","cardId":"TCS - 001 | Exclusive","category":"Exclusive"},
@@ -1853,14 +1841,6 @@
     let currentDeckViewMode = 'list'; 
     let communityDeckViewModes = {};
 
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        isAdminLoggedIn = true;
-      } else {
-        isAdminLoggedIn = false;
-      }
-      checkAdminAuthStatus();
-    });
 
     function listenToCommunityDecks() {
       db.collection("community_decks").orderBy("createdAt", "desc")
@@ -3274,10 +3254,33 @@
     }
 
     // INITIALIZATION
-    listenToCommunityDecks();
-    listenToCampDirectories();
-    listenToCampSchedules();
-    listenToLeaderboard();
+    async function initFirebase() {
+      try {
+        const res = await fetch('/api/firebase-config');
+        const firebaseConfig = await res.json();
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        auth = firebase.auth();
+
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            isAdminLoggedIn = true;
+          } else {
+            isAdminLoggedIn = false;
+          }
+          checkAdminAuthStatus();
+        });
+
+        listenToCommunityDecks();
+        listenToCampDirectories();
+        listenToCampSchedules();
+        listenToLeaderboard();
+      } catch (err) {
+        console.error("Gagal memuat konfigurasi Firebase:", err);
+      }
+    }
+
+    initFirebase();
     renderCards(allCards);
   </script>
 </body>
