@@ -1590,7 +1590,7 @@
           <div class="admin-table-container">
             <div class="deck-header" style="margin-bottom:12px; display: flex; justify-content: space-between; align-items: center;">
               <h2>Kelola Data Kartu (<span id="admin-total-count">0</span>)</h2>
-              <button class="btn btn-secondary" style="font-size:0.8rem; padding:4px 10px;" onclick="resetToDefaultData()">Reset ke Data Bawaan</button>
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:4px 10px;" onclick="uploadDefaultCardsToFirebase()">Upload Data Bawaan ke Firebase</button>
             </div>
             <table>
               <thead>
@@ -1704,7 +1704,7 @@
   </div>
 
   <script>
-  
+    // FIREBASE CONFIG dimuat dari /api/firebase-config (lihat initFirebase)
     let db, auth;
 
     const defaultCards = [
@@ -1815,19 +1815,16 @@
     const folderGambar = 'images';
     const ekstensiGambar = '.jpg';
 
-    defaultCards.forEach(card => {
+    function withImagePath(card) {
       if (!card.image) {
         const filenameId = card.cardId.replace('|', '').trim();
         card.image = `${folderGambar}/${filenameId}${ekstensiGambar}`;
       }
-    });
-
-    let savedCards = localStorage.getItem('renathea_cards_v7');
-    let allCards = savedCards ? JSON.parse(savedCards) : [...defaultCards];
-
-    function saveCardsToStorage() {
-      localStorage.setItem('renathea_cards_v7', JSON.stringify(allCards));
+      return card;
     }
+
+    // Data kartu dimuat dari Firestore collection "card_information"
+    let allCards = [];
 
     let userDeck = [];
     let communityDecks = [];
@@ -3155,13 +3152,20 @@
         series: "Custom", illustrator: "-"
       };
 
-      if (editIndex >= 0) { allCards[editIndex] = cardData; alert("✅ Kartu diperbarui!"); }
-      else { allCards.push(cardData); alert("✅ Kartu ditambahkan!"); }
+      let request;
+      if (editIndex >= 0) {
+        request = db.collection("card_information").doc(allCards[editIndex].id).update(cardData);
+      } else {
+        cardData.order = allCards.reduce((max, c) => Math.max(max, c.order || 0), 0) + 1;
+        request = db.collection("card_information").add(cardData);
+      }
 
-      saveCardsToStorage();
-      resetAdminForm();
-      renderAdminTable();
-      renderCards(allCards);
+      request
+        .then(() => {
+          alert(editIndex >= 0 ? "✅ Kartu diperbarui!" : "✅ Kartu ditambahkan!");
+          resetAdminForm();
+        })
+        .catch(err => alert("❌ Gagal menyimpan kartu: " + err.message));
     }
 
     function editCard(index) {
@@ -3183,10 +3187,8 @@
 
     function deleteCard(index) {
       if (confirm("Hapus kartu ini?")) {
-        allCards.splice(index, 1);
-        saveCardsToStorage();
-        renderAdminTable();
-        renderCards(allCards);
+        db.collection("card_information").doc(allCards[index].id).delete()
+          .catch(err => alert("❌ Gagal menghapus kartu: " + err.message));
       }
     }
 
@@ -3197,14 +3199,33 @@
       document.getElementById('admin-power').value = "0";
     }
 
-    function resetToDefaultData() {
-      if (confirm("Reset database ke awal?")) {
-        localStorage.removeItem('renathea_cards_v7');
-        allCards = [...defaultCards];
-        renderAdminTable();
-        renderCards(allCards);
-        alert("✅ Database direset ke bawaan.");
+    // Upload sekali: memindahkan defaultCards ke Firestore (hanya jika collection masih kosong)
+    function uploadDefaultCardsToFirebase() {
+      if (allCards.length > 0) {
+        alert("⚠️ Collection card_information sudah berisi " + allCards.length + " kartu. Upload dibatalkan.");
+        return;
       }
+      if (!confirm("Upload " + defaultCards.length + " kartu bawaan ke Firebase?")) return;
+
+      const batch = db.batch();
+      defaultCards.forEach((card, i) => {
+        batch.set(db.collection("card_information").doc(), { ...card, order: i + 1 });
+      });
+      batch.commit()
+        .then(() => alert("✅ " + defaultCards.length + " kartu berhasil diupload ke Firebase."))
+        .catch(err => alert("❌ Gagal upload kartu: " + err.message));
+    }
+
+    function listenToCardInformation() {
+      db.collection("card_information")
+        .onSnapshot((snapshot) => {
+          allCards = [];
+          snapshot.forEach((doc) => allCards.push(withImagePath({ id: doc.id, ...doc.data() })));
+          allCards.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+          applyFilters('search');
+          applyFilters('deck');
+          if (isAdminLoggedIn) renderAdminTable();
+        }, (error) => console.error("Gagal membaca data kartu:", error));
     }
 
     function showModalByCardId(cardId) {
@@ -3271,6 +3292,7 @@
           checkAdminAuthStatus();
         });
 
+        listenToCardInformation();
         listenToCommunityDecks();
         listenToCampDirectories();
         listenToCampSchedules();
